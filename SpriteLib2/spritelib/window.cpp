@@ -192,19 +192,25 @@ namespace spritelib
 				// If you want to, you can handle aspect ratio here
 			}
 
-			if (event.type == 5 || event.type == 6) // Keyboard events
+			if (m_keyboardFunction)
 			{
-				m_keyboardFunction((Key)(event.key.code), (EventType)(event.type));
+				if (event.type == 5 || event.type == 6) // Keyboard events
+				{
+					m_keyboardFunction((Key)(event.key.code), (EventType)(event.type));
+				}
 			}
-			if (event.type == 9 || event.type == 10) // Mouse button events
+			if (m_mouseFunction)
 			{
-				m_mouseFunction((Button)(event.mouseButton.button),
-					event.mouseButton.x, m_window->getSize().y - event.mouseButton.y, (EventType)(event.type));
-			}
-			if (event.type == 11)
-			{
-				m_mouseFunction(Button::UnknownButton,
-					event.mouseMove.x, m_window->getSize().y - event.mouseMove.y, (EventType)(event.type));
+				if (event.type == 9 || event.type == 10) // Mouse button events
+				{
+					m_mouseFunction((Button)(event.mouseButton.button),
+						event.mouseButton.x, m_window->getSize().y - event.mouseButton.y, (EventType)(event.type));
+				}
+				if (event.type == 11)
+				{
+					m_mouseFunction(Button::UnknownButton,
+						event.mouseMove.x, m_window->getSize().y - event.mouseMove.y, (EventType)(event.type));
+				}
 			}
 		}
 
