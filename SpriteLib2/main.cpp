@@ -12,8 +12,7 @@ int main()
 	// window definition
 
 	Window& myGame = Window::get_game_window();
-	myGame.init("Codename: CAJUN", 1280.0f, 720.0f, false)
-		.set_window_style(true, true);
+	myGame.init("Codename: CAJUN", 1280.0f, 720.0f, false);
 
 	//text settings: insert below
 
@@ -22,17 +21,18 @@ int main()
 		mGameState main = OPENING; // the opening cutscene for the game 
 		switch (main)
 		{
-		case OPENING: // the opening cutscene for the game 
-		{
+			case OPENING: // the opening cutscene for the game 
+				{
 
-		}
-		break;
+					mGameState main = MENU; // once the opening is complete, main has been set to menu, there for changing the switch case
+				}
+				break;
 
-		case MENU: //main menu 
-		{
+			case MENU: //main menu 
+				{
 
-		}
-		break;
+				}
+				break;
 		}
 	}
 

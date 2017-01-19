@@ -116,7 +116,7 @@ namespace spritelib
 		return *this;
 	}
 
-	Window & Window::set_mouse_callback(std::function<void(Button, int, int, EventType)> a_mouseFunction)
+	Window & Window::set_mouse_callback(std::function<void(Button, int, int, EventType)> a_mouseFunction) // useful to help make a button class #GABBY
 	{
 		m_mouseFunction = a_mouseFunction;
 		return *this;
