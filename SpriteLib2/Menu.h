@@ -5,5 +5,7 @@ using namespace spritelib;
 
 class Menu
 {
-
+	public:
+		void drawMenu();
+		void checkMenu();
 };

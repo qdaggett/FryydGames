@@ -1,4 +1,5 @@
 #include "spritelib\spritelib.h"
+#include "Menu.h"
 #include <iostream>
 using namespace spritelib;
 
@@ -10,6 +11,7 @@ enum mGameState { OPENING, MENU };
 int main()
 {
 	// window definition
+	Menu menu;
 
 	Window& myGame = Window::get_game_window();
 	myGame.init("Codename: CAJUN", 1280, 720)
@@ -37,14 +39,14 @@ int main()
 
 			case MENU: //main menu 
 				{
-					eGameState gamestate = M_STATION;\
+					eGameState gamestate = M_STATION;
 
 						// needing to draw the menu (draw menu fuction and then another that is check menu function)
 						// need a function to draw the actual menu and get the coordinate from artist
 						// inside of the mouse call back function 
 						//check the game state
 						// if the button is at x, y and width adn height 
-
+					menu.drawMenu();
 				}
 				break;
 		}

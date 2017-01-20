@@ -1,2 +1,8 @@
 ﻿  main.cpp
+  Menu.cpp
+  shader.cpp
+  shapes.cpp
+  sprite.cpp
+  text.cpp
+  window.cpp
 LINK : fatal error LNK1104: cannot open file 'C:\Users\100623554\Documents\GitHub\FryydGames\Release\SpriteLib2.exe'
