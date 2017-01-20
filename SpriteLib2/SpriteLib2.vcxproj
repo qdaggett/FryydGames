@@ -164,6 +164,7 @@
     <ClCompile Include="spritelib\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="spritelib\debug.h" />
     <ClInclude Include="spritelib\matrix4x4.h" />
     <ClInclude Include="spritelib\shader.h" />

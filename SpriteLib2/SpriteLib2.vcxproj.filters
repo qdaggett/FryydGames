@@ -81,6 +81,9 @@
     <ClInclude Include="spritelib\window.h">
       <Filter>Header Files\SpriteLib2</Filter>
     </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Header Files\SpriteLib2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\BlankVert.glsl">
