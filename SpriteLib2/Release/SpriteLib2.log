@@ -1,8 +1,3 @@
-﻿  main.cpp
-  Menu.cpp
-  shader.cpp
-  shapes.cpp
-  sprite.cpp
-  text.cpp
-  window.cpp
-LINK : fatal error LNK1104: cannot open file 'C:\Users\100623554\Documents\GitHub\FryydGames\Release\SpriteLib2.exe'
+﻿  Menu.cpp
+  main.cpp
+main.cpp(49): error C3867: 'Menu::drawMenu': non-standard syntax; use '&' to create a pointer to member

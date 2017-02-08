@@ -8,4 +8,11 @@ class Menu
 	public:
 		void drawMenu();
 		void checkMenu();
+
+	private:
+		void drawGameButton();
+		void drawPauseButton();
+		void drawQuitButton();
+		void drawSetButton();
+		void drawInstructButton();
 };

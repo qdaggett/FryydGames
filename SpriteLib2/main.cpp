@@ -15,7 +15,9 @@ int main()
 
 	Window& myGame = Window::get_game_window();
 	myGame.init("Codename: CAJUN", 1280, 720)
-		.set_window_style(true, true);
+		.set_screen_size(640, 432)
+		.set_clear_color(0, 255, 0);
+
 		// set mouse call back 
 
 		// We need to make a music class for sounds and streams etc. 
@@ -28,6 +30,9 @@ int main()
 	mGameState main = OPENING; // the opening cutscene for the game 
 	while (myGame.update(30)) // main game loop 
 	{
+		menu.drawMenu();
+		system("PAUSE");
+
 		switch (main)
 		{
 			case OPENING: // the opening cutscene for the game 
@@ -41,14 +46,16 @@ int main()
 				{
 					eGameState gamestate = M_STATION;
 
+					menu.drawMenu;
+
 						// needing to draw the menu (draw menu fuction and then another that is check menu function)
 						// need a function to draw the actual menu and get the coordinate from artist
 						// inside of the mouse call back function 
 						//check the game state
 						// if the button is at x, y and width adn height 
-					menu.drawMenu();
+					
 				}
-				break;
+				exit(0);
 		}
 	}
 
