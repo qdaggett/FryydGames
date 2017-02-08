@@ -8,6 +8,7 @@ class Menu
 	public:
 		void drawMenu();
 		void checkMenu();
+		void MouseFunc(Window::Button a_button, Window::EventType a_eventType);
 
 	private:
 		void drawGameButton();

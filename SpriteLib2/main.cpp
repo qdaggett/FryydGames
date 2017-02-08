@@ -16,7 +16,8 @@ int main()
 	Window& myGame = Window::get_game_window();
 	myGame.init("Codename: CAJUN", 1280, 720)
 		.set_screen_size(640, 432)
-		.set_clear_color(0, 255, 0);
+		.set_clear_color(0, 255, 0)
+		.show_mouse(true); // will show the mouse
 
 		// set mouse call back 
 
@@ -46,7 +47,7 @@ int main()
 				{
 					eGameState gamestate = M_STATION;
 
-					menu.drawMenu;
+				
 
 						// needing to draw the menu (draw menu fuction and then another that is check menu function)
 						// need a function to draw the actual menu and get the coordinate from artist

@@ -14,6 +14,17 @@ void Menu::drawMenu()
 	menu.drawGameButton();
 }
 
+void Menu::MouseFunc(Window::Button a_button, Window::EventType a_eventType)
+{
+	switch (a_button && a_eventType)
+	{
+	case Window::Button::LeftButton && Window::EventType::MouseButtonPressed && Window::EventType::MouseButtonReleased:
+		{
+			
+		}
+	}
+}
+
 void Menu::drawGameButton()
 {
 	Sprite gameButton;
@@ -28,5 +39,5 @@ void Menu::drawGameButton()
 
 void Menu::checkMenu()
 {
- 
+
 }
