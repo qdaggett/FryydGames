@@ -311,14 +311,8 @@ void Jump()
 	}
 }
 
-int main()
+void LoadSprites()
 {
-	Window& theGame = Window::get_game_window();//https://en.wikipedia.org/wiki/Singleton_pattern
-	theGame.init("MY GAME", 800, 562)
-		.set_screen_size(640, 562)
-		.set_keyboard_callback(KeyboardFunc)
-		.set_clear_color(0, 255, 0);
-
 	//loading the sprites
 	background.load_sprite_image("assets/images/Background_final.png")
 		.set_scale(1717, 432);
@@ -356,6 +350,17 @@ int main()
 
 	enemies.push_back(new Dairy(600, 130, 2, 10, enemy));
 	enemies.push_back(new Meat(1200, 50, 5, 30, enemy2));
+}
+
+int main()
+{
+	Window& theGame = Window::get_game_window();//https://en.wikipedia.org/wiki/Singleton_pattern
+	theGame.init("MY GAME", 800, 562)
+		.set_screen_size(640, 562)
+		.set_keyboard_callback(KeyboardFunc)
+		.set_clear_color(0, 255, 0);
+
+	LoadSprites();
 
 	//The main game loop
 	while (theGame.update(30))
