@@ -7,13 +7,12 @@ class Menu
 {
 	public:
 		void drawMenu();
-		void checkMenu();
-		void MouseFunc(Window::Button a_button, Window::EventType a_eventType);
 
 	private:
-		void drawGameButton();
-		void drawPauseButton();
-		void drawQuitButton();
-		void drawSetButton();
-		void drawInstructButton();
+		void drawGameButton() const;
+		void drawPauseButton() const;
+		void drawQuitButton() const;
+		void drawCreditButton() const;
+		void drawSetButton() const;
+		void drawInstructButton() const;
 };

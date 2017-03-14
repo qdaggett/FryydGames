@@ -153,7 +153,6 @@ namespace spritelib
 			MiddleButton,     // The middle (wheel) mouse button
 			XButton1,   // The first extra mouse button
 			XButton2,   // The second extra mouse button
-						 
 			ButtonCount // Keep last -- the total number of mouse buttons
 		};
 
