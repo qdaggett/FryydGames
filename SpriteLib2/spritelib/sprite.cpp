@@ -20,7 +20,7 @@ namespace spritelib
 	}
 
 	/* load_sprite_image
-		- fileLoc is the file location of the image you want to use for your sprite
+	- fileLoc is the file location of the image you want to use for your sprite
 	*/
 	Sprite & Sprite::load_sprite_image(std::string a_fileLoc, bool a_setScale)
 	{
@@ -45,7 +45,7 @@ namespace spritelib
 	}
 
 	/* set_sprite_frame_size
-		- width/height will tell the program how big your sprite is on the spritesheet (in pixels)
+	- width/height will tell the program how big your sprite is on the spritesheet (in pixels)
 	*/
 	Sprite & Sprite::set_sprite_frame_size(unsigned int a_width, unsigned int a_height, bool a_setScale)
 	{
@@ -57,12 +57,12 @@ namespace spritelib
 		}
 		return *this;
 	}
-	
+
 	/* push_frame_row
-		- animationID is a string that you use to set which animation you're using later on
-		- startx/starty are the coordinates of the very first frame
-		- spacingX/spacingY are the pixel offsets in between each frame
-		- numFrames are the number of frames in the row you're adding
+	- animationID is a string that you use to set which animation you're using later on
+	- startx/starty are the coordinates of the very first frame
+	- spacingX/spacingY are the pixel offsets in between each frame
+	- numFrames are the number of frames in the row you're adding
 	*/
 	Sprite & Sprite::push_frame_row(std::string a_animationID, unsigned int a_startX, unsigned int a_startY, int a_spacingX, int a_spacingY, unsigned int a_numFrames)
 	{
@@ -75,35 +75,35 @@ namespace spritelib
 	}
 
 	/* push_frame
-		- animationID is a string that you use to set which animation you're using later on
-		- x/y are the coordinates of the frame (bottom left). Be sure to call set_sprite_frame_size() first
+	- animationID is a string that you use to set which animation you're using later on
+	- x/y are the coordinates of the frame (bottom left). Be sure to call set_sprite_frame_size() first
 	*/
 	Sprite & Sprite::push_frame(std::string a_animationID, unsigned int a_x, unsigned int a_y)
 	{
 		m_animations[a_animationID].push_back({ a_x, a_y });
 		return *this;
 	}
-	
+
 	/* pop_frame
-		- will remove an animation from the animation with the ID you set
+	- will remove an animation from the animation with the ID you set
 	*/
 	Sprite & Sprite::pop_frame(std::string a_animationID)
 	{
 		m_animations[a_animationID].pop_back();
 		return *this;
 	}
-	
+
 	/* set_animation
-		- set the animation that we use with the sprite
+	- set the animation that we use with the sprite
 	*/
 	Sprite & Sprite::set_animation(std::string a_animationID)
 	{
 		m_currentAnimation = a_animationID;
 		return *this;
 	}
-	
+
 	/* set_frame
-		- set the frame our animation is currently on
+	- set the frame our animation is currently on
 	*/
 	Sprite & Sprite::set_frame(unsigned int a_frame)
 	{
@@ -111,8 +111,18 @@ namespace spritelib
 		return *this;
 	}
 
+	unsigned int Sprite::get_current_frame()
+	{
+		return m_currentFrame;
+	}
+
+	bool Sprite::get_flip()
+	{
+		return m_flip;
+	}
+
 	/* set_center
-		- centerX/centerY are the coordinates of the pivot
+	- centerX/centerY are the coordinates of the pivot
 	*/
 	Sprite & Sprite::set_center(float a_centerX, float a_centerY)
 	{
@@ -122,7 +132,7 @@ namespace spritelib
 	}
 
 	/* next_frame
-		- increment the frame by one
+	- increment the frame by one
 	*/
 	Sprite & Sprite::next_frame()
 	{
@@ -130,8 +140,15 @@ namespace spritelib
 		return *this;
 	}
 
+	void Sprite::set_flipped(bool flip)
+	{
+		m_flip = flip;
+		m_transformationUpdated = true;
+	}
+
+
 	/* draw
-		- draw your sprite to the screen. This function uses the texture and position to draw the sprite on the screen
+	- draw your sprite to the screen. This function uses the texture and position to draw the sprite on the screen
 	*/
 	Sprite & Sprite::draw()
 	{
@@ -151,7 +168,14 @@ namespace spritelib
 			m_modelMatrix = m_modelMatrix.multiply(math::Matrix4x4::translate(m_position));
 			m_modelMatrix = m_modelMatrix.multiply(math::Matrix4x4::rotate(m_rotation));
 			m_modelMatrix = m_modelMatrix.multiply(math::Matrix4x4::translate(center));
-			m_modelMatrix = m_modelMatrix.multiply(math::Matrix4x4::scale(m_scale));
+
+			auto flippedScale = m_scale;
+			if (m_flip)
+			{
+				flippedScale.x = -m_scale.x;
+			}
+
+			m_modelMatrix = m_modelMatrix.multiply(math::Matrix4x4::scale(flippedScale));
 		}
 
 		auto imageSize = m_images[m_loc].getSize();
@@ -184,8 +208,8 @@ namespace spritelib
 	}
 
 	/* draw
-		- sp is the shader program you can use to draw your sprite. You can set uniforms before calling this function
-			- If you use this function, you're responsible for transforming/texturing the sprite
+	- sp is the shader program you can use to draw your sprite. You can set uniforms before calling this function
+	- If you use this function, you're responsible for transforming/texturing the sprite
 	*/
 	Sprite & Sprite::draw(ShaderProgram & sp)
 	{
@@ -197,7 +221,7 @@ namespace spritelib
 	}
 
 	/* set_position
-		- x/y are the coordinates on the screen where the sprite will be (from the center)
+	- x/y are the coordinates on the screen where the sprite will be (from the center)
 	*/
 	Sprite & Sprite::set_position(float a_x, float a_y)
 	{
@@ -206,9 +230,9 @@ namespace spritelib
 		m_position.y = a_y;
 		return *this;
 	}
-	
+
 	/* set_scale
-		- width/height will scale your sprite. 
+	- width/height will scale your sprite.
 	*/
 	Sprite & Sprite::set_scale(float a_width, float a_height)
 	{
@@ -218,7 +242,7 @@ namespace spritelib
 	}
 
 	/* set_rotation
-		- rotation will set the rotation of the sprite in degrees (clockwise)
+	- rotation will set the rotation of the sprite in degrees (clockwise)
 	*/
 	Sprite & Sprite::set_rotation(float a_rotation)
 	{
@@ -228,8 +252,8 @@ namespace spritelib
 	}
 
 	/* set_depth
-		- this will set the sprite's depth. Useful for sorting them before drawing them
-			- This doesn't affect how the sprite is drawn. It is up to you to SORT the sprites
+	- this will set the sprite's depth. Useful for sorting them before drawing them
+	- This doesn't affect how the sprite is drawn. It is up to you to SORT the sprites
 	*/
 	Sprite & Sprite::set_depth(float a_depth)
 	{
@@ -239,7 +263,7 @@ namespace spritelib
 	}
 
 	/* get_position
-		- this returns a Vector3 with the position of the sprite
+	- this returns a Vector3 with the position of the sprite
 	*/
 	math::Vector3 Sprite::get_position()
 	{
@@ -247,7 +271,7 @@ namespace spritelib
 	}
 
 	/* get_scale
-		- this returns a Vector3 with the scale of your sprite
+	- this returns a Vector3 with the scale of your sprite
 	*/
 	math::Vector3 Sprite::get_scale()
 	{
@@ -255,9 +279,9 @@ namespace spritelib
 	}
 
 	/* get_rotation
-		- this returns the current rotation of your sprite (in degrees, clockwise)
-			- usage example: if you want to rotate your sprite 1 degree, you can do this
-			mySprite.set_rotation(mySprite.get_rotation() + 1.0f);
+	- this returns the current rotation of your sprite (in degrees, clockwise)
+	- usage example: if you want to rotate your sprite 1 degree, you can do this
+	mySprite.set_rotation(mySprite.get_rotation() + 1.0f);
 	*/
 	float Sprite::get_rotataion()
 	{
@@ -265,13 +289,13 @@ namespace spritelib
 	}
 
 	/* get_depth
-		- this is used for implementing sorting of sprites. You can organize the depth of sprites with this
+	- this is used for implementing sorting of sprites. You can organize the depth of sprites with this
 	*/
 	float Sprite::get_depth()
 	{
 		return m_position.z;
 	}
-	
+
 	unsigned int Sprite::Quad::m_vbo = 0U;
 	unsigned int Sprite::Quad::m_ebo = 0U;
 	unsigned int Sprite::Quad::m_vao = 0U;

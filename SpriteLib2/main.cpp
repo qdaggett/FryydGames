@@ -13,9 +13,8 @@
 using namespace spritelib;
 using namespace std;
 
-Sprite background, background2, player, enemy, enemy2, platform, theFloor, theUI, dead;
+Sprite background, background2, player, enemy, enemy2, platform, theFloor, theUI, dead, menu;
 
-bool direction = true;
 bool playerA = false;
 int counter = 600;
 int newCounter = 1300;
@@ -24,8 +23,11 @@ bool weapon1 = false, weapon2 = false;
 float playerHealth = 100.0f;
 float groundLvl = 50;
 int cheese = 1, meat = 1;
-
+int gamestates = 0;
 vector<Monster*> enemies;
+
+std::vector<Sprite*> spritesToDraw;
+void IterativeSelectionSort(std::vector<Sprite*>& a_sprites);
 
 //physics
 float magnitude = 10;
@@ -121,11 +123,16 @@ void KeyboardFunc(Window::Key a_key, Window::EventType a_eventType)
 			if (x + background.get_scale().x > Window::get_game_window().get_width(true))
 			{
 				scrollLeft(7);
-
 			}
 
 			if (px + 90 < Window::get_game_window().get_width(true))
+			{
+				player.set_flipped(false);
 				player.set_position(px += 3, py);	 //if the player is less than the right boundary they can move forward
+				player.set_animation("walk");
+
+			}
+
 
 			curr_states = face_right;
 		}
@@ -137,9 +144,12 @@ void KeyboardFunc(Window::Key a_key, Window::EventType a_eventType)
 				scrollRight(7);
 			}
 
-			if (px  >0)
+			if (px > 0)
+			{
 				player.set_position(px -= 3, py); // if the player is before the left boundary they can move back
-
+				player.set_flipped(true);
+				player.set_animation("walk");
+			}
 			curr_states = face_left;
 		}
 		else if (a_key == Window::Key::E)
@@ -162,6 +172,14 @@ void KeyboardFunc(Window::Key a_key, Window::EventType a_eventType)
 		}
 	}
 	break;
+	case Window::EventType::KeyReleased:
+	{
+		if (curr_states == face_right)
+			player.set_animation("idle");
+
+		if (curr_states == face_left)
+			player.set_animation("idle");
+	}
 	}
 }
 
@@ -247,14 +265,14 @@ void Jump()
 	{
 		jumpCounter++;
 
-		if (jumpCounter >= 6)
+		if (jumpCounter >= 10)
 		{
 			platformCollision(player, platform, 400, 20, groundLvl);
 		}
 
 		if (curr_states == face_right)
 		{
-			scrollLeft(3);
+			scrollLeft(7);
 
 			if (jumpCounter <= 6)
 			{
@@ -282,7 +300,7 @@ void Jump()
 		}
 		if (curr_states == face_left)
 		{
-			scrollRight(3);
+			scrollRight(7);
 			if (jumpCounter <= 6)
 			{
 				posx = posx - (magnitude);
@@ -311,25 +329,65 @@ void Jump()
 	}
 }
 
+void Update()
+{
+	background.draw();
+	theUI.draw();
+	theFloor.draw();
+	platform.draw();
+
+	if (playerHealth > 0)
+		player.next_frame();
+	((Dairy*)enemies[0])->nextFrame();
+	((Meat*)enemies[1])->nextFrame();
+}
+
+void IterativeSelectionSort(std::vector<Sprite*>& a_sprites)
+{
+	for (unsigned int i = 0; i < a_sprites.size(); i++)
+	{
+		int minIndex = i;
+		for (unsigned int j = i; j < a_sprites.size(); j++)
+		{
+			if (a_sprites[j]->get_depth() < a_sprites[minIndex]->get_depth())
+			{
+				minIndex = j;
+			}
+		}
+		std::swap(a_sprites[minIndex], a_sprites[i]);
+	}
+}
+
 void LoadSprites()
 {
 	//loading the sprites
 	background.load_sprite_image("assets/images/Background_final.png")
 		.set_scale(1717, 432);
 
-	player.load_sprite_image("assets/images/Achef.png")
+	player.load_sprite_image("assets/images/main char SS.png")
 		.set_scale(100, 120)
+		.set_sprite_frame_size(141.2, 141)
+		.push_frame_row("walk", 0, 0, 141.2, 0, 5)
+		.push_frame("idle", 0, 0)
 		.set_center(0, 0)
-		.set_position(0, groundLvl);
+		.set_position(0, groundLvl)
+		.set_animation("idle");
 
-	enemy.load_sprite_image("assets/images/Acheese.png")
+	enemy.load_sprite_image("assets/images/cheese walk ss.png")
+		.set_sprite_frame_size(460, 460)
+		.push_frame_row("walk", 0, 0, 460, 0, 8)
+		.push_frame("idle", 0, 0)
 		.set_scale(100, 100)
 		.set_position(600, 50)
 		.set_center(0, 0);
 
-	enemy2.load_sprite_image("assets/images/AMeat.png")
+	enemy2.load_sprite_image("assets/images/meat walk ss.png")
 		.set_scale(130, 130)
+		.set_sprite_frame_size(160, 160)
+		.push_frame_row("walk", 0, 0, 160, 0, 4)
+		.push_frame("idle", 160, 0)
 		.set_position(1200, 50)
+		.set_animation("idle")
 		.set_center(0, 0);
 
 	platform.load_sprite_image("assets/images/Table.png")
@@ -346,16 +404,75 @@ void LoadSprites()
 		.set_position(-10, 390);
 
 	dead.load_sprite_image("assets/images/Dead.png")
-		.set_scale(100, 120);
+		.set_scale(140, 160);
+
+	menu.load_sprite_image("assets/images/menu.png")
+		.set_scale(640, 562);
 
 	enemies.push_back(new Dairy(600, 130, 2, 10, enemy));
 	enemies.push_back(new Meat(1200, 50, 5, 30, enemy2));
+
+	spritesToDraw.push_back(&player);
+	spritesToDraw.push_back(&enemy);
+	spritesToDraw.push_back(&enemy2);
+}
+
+void FirstLevel()
+{
+	Update();
+
+	UI();
+
+	//Does the falling off the platform stuff
+	if (jump_state == Platform)
+	{
+		if (player.get_position().x < platform.get_position().x - 60 || player.get_position().x >(platform.get_position().x + 380))
+		{
+			groundLvl = 50;
+			player.set_position(player.get_position().x, groundLvl);
+			jump_state = ground;
+		}
+	}
+
+	Jump();
+
+	//the player death and stuff
+	if (playerHealth > 0)
+		player.draw();
+	if (playerHealth <= 0)
+	{
+		dead.set_position(player.get_position().x, player.get_position().y - 40);
+		dead.draw();
+	}
+
+	//drawing the enemies + their death
+	if (enemies[0]->getHealth() > 0)
+	{
+		((Dairy*)enemies[0])->move(400, 700, counter);
+		((Dairy*)enemies[0])->draw();
+		enemies[0]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon1, playerHealth);
+	}
+	if (enemies[1]->getHealth() > 0)
+	{
+		((Meat*)enemies[1])->move(1200, 1600, newCounter);
+		((Meat*)enemies[1])->draw();
+		enemies[1]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon2, playerHealth);
+	}
+
+	if (enemies[0]->getHealth() == 0)
+	{
+		cheese = 0;
+	}
+	if (enemies[1]->getHealth() == 0)
+	{
+		meat = 0;
+	}
 }
 
 int main()
 {
 	Window& theGame = Window::get_game_window();//https://en.wikipedia.org/wiki/Singleton_pattern
-	theGame.init("MY GAME", 800, 562)
+	theGame.init("OPERATION CAJUN", 800, 562)
 		.set_screen_size(640, 562)
 		.set_keyboard_callback(KeyboardFunc)
 		.set_clear_color(0, 255, 0);
@@ -365,56 +482,22 @@ int main()
 	//The main game loop
 	while (theGame.update(30))
 	{
-		background.draw();
-		theUI.draw();
-		theFloor.draw();
-		platform.draw();
-		UI();
-
-		if (jump_state == Platform)
+		if (gamestates == 0)
 		{
-			if (player.get_position().x < platform.get_position().x - 60 || player.get_position().x >(platform.get_position().x + 380))
-			{
-				groundLvl = 50;
-				player.set_position(player.get_position().x, groundLvl);
-				jump_state = ground;
-			}
+			//PUT THE CODE FOR THE MENU HERE
+			//THIS IS A BASE
+			menu.draw();
+
+			if (GetAsyncKeyState('A')) gamestates = 1;
+		}
+		if (gamestates == 1)
+		{
+			FirstLevel();
 		}
 
-		Jump();
-
-		if (playerHealth > 0)
-		{
-			player.draw();
-		}
-		if (playerHealth <= 0)
-		{
-			dead.set_position(player.get_position().x, player.get_position().y - 20);
-			dead.draw();
-		}
-
-		if (enemies[0]->getH() > 0)
-		{
-			((Dairy*)enemies[0])->move(400, 700, counter);
-			((Dairy*)enemies[0])->draw();
-			enemies[0]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon1, playerHealth);
-		}
-		if (enemies[1]->getH() > 0)
-		{
-			((Meat*)enemies[1])->move(1200, 1600, newCounter);
-			((Meat*)enemies[1])->draw();
-			enemies[1]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon2, playerHealth);
-		}
-
-		if (enemies[0]->getH() == 0)
-		{
-			cheese = 0;
-		}
-		if (enemies[1]->getH() == 0)
-		{
-			meat = 0;
-		}
 	}
 	return 0;
 }
+
+
 
