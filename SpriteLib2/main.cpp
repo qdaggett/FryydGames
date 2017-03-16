@@ -3,9 +3,11 @@
 #include <streambuf>
 #include <vector>
 #include <iostream>
+#include "Menu.h"
 #include "Monster.h"
 #include "Meat.h"
 #include "Dairy.h"
+#include "Buttons.h"
 #include <vector>
 #include <time.h>
 #include <Windows.h>
@@ -14,6 +16,7 @@ using namespace spritelib;
 using namespace std;
 
 Sprite background, background2, player, enemy, enemy2, platform, theFloor, theUI, dead;
+Menu mainM;
 
 bool direction = true;
 bool playerA = false;
@@ -164,6 +167,55 @@ void KeyboardFunc(Window::Key a_key, Window::EventType a_eventType)
 	break;
 	}
 }
+
+void MouseFunc(Window::Button a_button, int a_mouseX, int a_mouseY, Window::EventType a_eventType)
+{
+	Buttons game, credit, set;
+
+	//new game button coordinates
+	game.pos_x = 50;
+	game.pos_y = 80;
+	game.width = 800;
+	game.height = 500;
+
+	//pause button
+	set.pos_x = 525;
+	set.pos_y = 80;
+	set.width = 800;
+	set.height = 500;
+
+	//credit button
+	credit.pos_x = 650;
+	credit.pos_y = 80;
+	credit.width = 800;
+	credit.height = 500;
+
+	//quit button
+	//quit.pos_x =
+	//quit.pos_y =
+	//quit.width =
+	//quit.height =
+
+	switch (a_eventType) {
+
+	case Window::EventType::MouseButtonPressed:
+	{
+		if (a_button == Window::Button::LeftButton)
+		{
+			//START BUTTON
+			//statement will check the coordinate of the bottom right corner of the sprite then by adding the height and width, the whole button is taken into consideration
+			if (a_mouseX > game.pos_x && a_mouseX < game.pos_x + game.width && a_mouseY > game.pos_y && a_mouseY < game.pos_y + game.height)
+			{
+				cout << "Start Game";
+				Window& theGame = Window::get_game_window();
+			}
+		}
+	}
+	break;
+	
+	}
+}
+
 
 void UI()
 {
@@ -352,13 +404,31 @@ void LoadSprites()
 	enemies.push_back(new Meat(1200, 50, 5, 30, enemy2));
 }
 
-int main()
+int main() 
 {
+
+	Window& menu = Window::get_game_window();
+	menu.init("Operation: CAJUN", 800, 562)
+		.set_screen_size(640, 562)
+		.set_mouse_callback(MouseFunc)
+		.set_clear_color(0, 255, 0);
+
 	Window& theGame = Window::get_game_window();//https://en.wikipedia.org/wiki/Singleton_pattern
-	theGame.init("MY GAME", 800, 562)
+	theGame.init("Operation: CAJUN", 800, 562)
 		.set_screen_size(640, 562)
 		.set_keyboard_callback(KeyboardFunc)
+		.set_mouse_callback(MouseFunc)
 		.set_clear_color(0, 255, 0);
+
+	// We need to make a music class for sounds and streams etc. 
+	//sf::Music or Sound (the sound setting) and (loding the sound) SoundBuffer 
+	// sound buffer is also good 
+	// to add music -> menuMusic.openFromFile(file path to assets) 
+
+	while (menu.update(30))
+	{
+		mainM.drawMenu();
+	}
 
 	LoadSprites();
 

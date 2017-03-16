@@ -157,6 +157,7 @@
     <ClCompile Include="Dairy.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Meat.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="spritelib\matrix4x4.cpp" />
     <ClCompile Include="spritelib\shader.cpp" />
@@ -167,8 +168,10 @@
     <ClCompile Include="spritelib\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buttons.h" />
     <ClInclude Include="Dairy.h" />
     <ClInclude Include="Meat.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="spritelib\debug.h" />
     <ClInclude Include="spritelib\matrix4x4.h" />
