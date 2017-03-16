@@ -14,15 +14,15 @@ Monster::Monster(float newX, float newY, int newS, int h, Sprite newM)
 
 }
 
+void Monster::nextFrame()
+{
+	monster.next_frame();
+}
+
 void Monster::shiftLeft(float shift)
 {
 	x -= shift;
 	monster.set_position(x, y);
-}
-
-int Monster::getH()
-{
-	return health;
 }
 
 void Monster::draw()
@@ -61,4 +61,56 @@ void Monster::Collisions(float playerx, float playery, bool &attack, bool weapon
 		if (phealth > 0)
 			phealth -= 1.0f;
 	}
+}
+//the setters
+void Monster::setD(bool newD)
+{
+	direction = newD;
+}
+
+void Monster::setHealth(int newH)
+{
+	health = newH;
+}
+
+void Monster::setX(int newX)
+{
+	x = newX;
+}
+
+void Monster::setY(int newY)
+{
+	y = newY;
+}
+
+void Monster::setSpeed(int newS)
+{
+	speed = newS;
+}
+
+
+//the getters
+int Monster::getHealth()
+{
+	return health;
+}
+
+bool Monster::getD()
+{
+	return direction;
+}
+
+float Monster::getX()
+{
+	return x;
+}
+
+float Monster::getY()
+{
+	return y;
+}
+
+int Monster::getSpeed()
+{
+	return speed;
 }

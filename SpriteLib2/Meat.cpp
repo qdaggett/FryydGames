@@ -3,40 +3,38 @@
 Meat::Meat(int x, int y, int newS, int h, Sprite newM)
 	: Monster(x, y, newS, h, newM)
 {
-
+	setD(false);
 }
 
 void Meat::move(int backLimit, int frontLimit, int &thecounter)
 {
-	if (direction == true)
+	float posx = getX();
+	float posy = getY();
+	if (getD() == true)
 	{
-		x -= speed;
-		thecounter -= speed;
-		monster.set_position(x, y);
+		monster.set_flipped(true);
+		monster.set_animation("walk");
+		setX(posx -= getSpeed());
+		thecounter -= getSpeed();
+		monster.set_position(posx, posy);
 
 		if (thecounter <= backLimit)
 		{
-			direction = false;
+			setD(false);
 		}
 	}
-	else if (direction == false)
+	else if (getD() == false)
 	{
-		x += speed;
-		thecounter += speed;
-		monster.set_position(x, y);
+		monster.set_flipped(false);
+		monster.set_animation("walk");
+		setX(posx += getSpeed());
+		thecounter += getSpeed();
+		monster.set_position(posx, posy);
 
 		if (thecounter >= frontLimit)
 		{
-			direction = true;
+			setD(true);
 		}
 	}
-
-
 }
 
-void Meat::Update(int backLimit, int frontLimit, int &thecounter)
-{
-
-	monster.draw();
-	move(backLimit, frontLimit, thecounter);
-}

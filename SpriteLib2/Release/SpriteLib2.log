@@ -1,15 +1,13 @@
 ﻿  main.cpp
-main.cpp(35): warning C4305: 'initializing': truncation from 'double' to 'float'
-main.cpp(77): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-main.cpp(78): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-main.cpp(92): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-main.cpp(93): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+main.cpp(37): warning C4305: 'initializing': truncation from 'double' to 'float'
+main.cpp(79): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+main.cpp(80): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+main.cpp(94): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+main.cpp(95): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+main.cpp(421): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+main.cpp(422): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  Generating code
-  3 of 2049 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    9 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\100623554\Documents\GitHub\FryydGames\Release\vc120.pdb'; linking object as if no debug info
-  SpriteLib2.vcxproj -> C:\Users\100623554\Documents\GitHub\FryydGames\Release\SpriteLib2.exe
-  SpriteLib2.vcxproj -> C:\Users\100623554\Documents\GitHub\FryydGames\Release\SpriteLib2.pdb (Full PDB)
+main.obj : error LNK2001: unresolved external symbol "public: int __thiscall Monster::getHealth(void)" (?getHealth@Monster@@QAEHXZ)
+main.obj : error LNK2001: unresolved external symbol "public: void __thiscall Monster::nextFrame(void)" (?nextFrame@Monster@@QAEXXZ)
+main.obj : error LNK2001: unresolved external symbol "public: void __thiscall spritelib::Sprite::set_flipped(bool)" (?set_flipped@Sprite@spritelib@@QAEX_N@Z)
+C:\Users\100623554\Documents\GitHub\FryydGames\Release\SpriteLib2.exe : fatal error LNK1120: 3 unresolved externals
