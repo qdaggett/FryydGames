@@ -220,7 +220,7 @@ void MouseFunc(Window::Button a_button, int a_mouseX, int a_mouseY, Window::Even
 	{
 		if (a_button == Window::Button::LeftButton)
 		{
-			//START BUTTON
+			//START BUTTON p.s. this needs to get fixed because of the boundaries 
 			//statement will check the coordinate of the bottom right corner of the sprite then by adding the height and width, the whole button is taken into consideration
 			if (a_mouseX > game.pos_x && a_mouseX < game.pos_x + game.width && a_mouseY > game.pos_y && a_mouseY < game.pos_y + game.height)
 			{

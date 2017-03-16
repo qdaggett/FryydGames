@@ -27,7 +27,7 @@ public:
 	float getX();
 
 	float getY();
-
+	
 	int getSpeed();
 
 	//The setters
@@ -44,7 +44,7 @@ public:
 
 
 protected:
-
+	
 	Sprite monster;
 private:
 

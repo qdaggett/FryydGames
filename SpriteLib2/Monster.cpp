@@ -22,13 +22,13 @@ void Monster::nextFrame()
 void Monster::shiftLeft(float shift)
 {
 	x -= shift;
-	monster.set_position(x, y);
+	monster.set_position(x,y);
 }
 
 void Monster::draw()
 {
 	monster.draw();
-
+	
 }
 
 void Monster::shiftRight(float shift)
@@ -59,7 +59,7 @@ void Monster::Collisions(float playerx, float playery, bool &attack, bool weapon
 	if (distanceBetween < radiuses)
 	{
 		if (phealth > 0)
-			phealth -= 1.0f;
+		phealth -= 1.0f;
 	}
 }
 //the setters
