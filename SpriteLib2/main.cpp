@@ -7,6 +7,7 @@
 #include "Monster.h"
 #include "Meat.h"
 #include "Dairy.h"
+#include "Cleaver.h"
 #include "Buttons.h"
 #include <vector>
 #include <time.h>
@@ -16,7 +17,7 @@ using namespace spritelib;
 using namespace std;
 
 Menu mainM;
-Sprite background, background2, player, enemy, enemy2, platform, theFloor, theUI, dead, menu;
+Sprite background, background2, player, enemy, enemy2, enemy3, platform, theFloor, theUI, dead, menu;
 
 bool playerA = false;
 int counter = 600;
@@ -392,6 +393,7 @@ void Update()
 		player.next_frame();
 	((Dairy*)enemies[0])->nextFrame();
 	((Meat*)enemies[1])->nextFrame();
+	((Cleaver*)enemies[2])->nextFrame();
 }
 
 void IterativeSelectionSort(std::vector<Sprite*>& a_sprites)
@@ -442,6 +444,15 @@ void LoadSprites()
 		.set_animation("idle")
 		.set_center(0, 0);
 
+	enemy3.load_sprite_image("assets/images/Cleaver.png")
+		.set_scale(320, 320)
+		.set_sprite_frame_size(320, 320)
+		.push_frame("fly", 0, 0)
+		.set_position(600, 20)
+		.set_animation("fly")
+		.set_center(0, 0);
+
+
 	platform.load_sprite_image("assets/images/Table.png")
 		.set_scale(400, 120)
 		.set_position(400, 50);
@@ -463,10 +474,12 @@ void LoadSprites()
 
 	enemies.push_back(new Dairy(600, 130, 2, 10, enemy));
 	enemies.push_back(new Meat(1200, 50, 5, 30, enemy2));
+	enemies.push_back(new Cleaver(600, 130, 2, 10, enemy3));
 
 	spritesToDraw.push_back(&player);
 	spritesToDraw.push_back(&enemy);
 	spritesToDraw.push_back(&enemy2);
+	spritesToDraw.push_back(&enemy3);
 }
 
 void FirstLevel()
@@ -509,6 +522,12 @@ void FirstLevel()
 		((Meat*)enemies[1])->move(1200, 1600, newCounter);
 		((Meat*)enemies[1])->draw();
 		enemies[1]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon2, playerHealth);
+	}
+	if (enemies[2]->getHealth() > 0)
+	{
+		((Cleaver*)enemies[2])->move(450, 1650, newCounter);
+		((Cleaver*)enemies[2])->draw();
+		enemies[2]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon2, playerHealth);
 	}
 
 	if (enemies[0]->getHealth() == 0)

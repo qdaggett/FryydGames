@@ -64,6 +64,9 @@
     <ClCompile Include="Meat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cleaver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="spritelib\debug.h">
@@ -106,6 +109,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cleaver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
