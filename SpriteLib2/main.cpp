@@ -17,7 +17,7 @@ using namespace spritelib;
 using namespace std;
 
 Menu mainM;
-Sprite background, background2, player, enemy, enemy2, enemy3, platform, theFloor, theUI, dead, menu;
+Sprite background, background2, player, enemy, enemy2, enemy3, platform, theFloor, theUI, dead;
 
 bool playerA = false;
 int counter = 600;
@@ -36,7 +36,6 @@ void IterativeSelectionSort(std::vector<Sprite*>& a_sprites);
 //physics
 float magnitude = 10;
 float acc_y = 9.8;
-
 int jumpCounter = 0;
 
 enum states
@@ -194,20 +193,20 @@ void MouseFunc(Window::Button a_button, int a_mouseX, int a_mouseY, Window::Even
 	//new game button coordinates
 	game.pos_x = 50;
 	game.pos_y = 80;
-	game.width = 800;
-	game.height = 500;
+	game.width = 100;
+	game.height = 50;
 
 	//pause button
 	set.pos_x = 525;
 	set.pos_y = 80;
-	set.width = 800;
-	set.height = 500;
+	set.width = 100;
+	set.height = 50;
 
 	//credit button
 	credit.pos_x = 650;
 	credit.pos_y = 80;
-	credit.width = 800;
-	credit.height = 500;
+	credit.width = 100;
+	credit.height = 50;
 
 	//quit button
 	//quit.pos_x =
@@ -221,12 +220,16 @@ void MouseFunc(Window::Button a_button, int a_mouseX, int a_mouseY, Window::Even
 	{
 		if (a_button == Window::Button::LeftButton)
 		{
-			//START BUTTON p.s. this needs to get fixed because of the boundaries 
-			//statement will check the coordinate of the bottom right corner of the sprite then by adding the height and width, the whole button is taken into consideration
-			if (a_mouseX > game.pos_x && a_mouseX < game.pos_x + game.width && a_mouseY > game.pos_y && a_mouseY < game.pos_y + game.height)
+			if (gamestates == 0) // the buttons will only click when it is on the menu level
 			{
-				cout << "Start Game";
-				gamestates = 1;
+				//statement will check the coordinate of the bottom right corner of the sprite then by adding the height and width, the whole button is taken into consideration
+				// START BUTTON >>>
+				if (a_mouseX > game.pos_x && a_mouseX < game.pos_x + game.width && a_mouseY > game.pos_y && a_mouseY < game.pos_y + game.height)
+				{
+					cout << "Start Game";
+					gamestates = 1;
+					mainM.pausemMusic();
+				}
 			}
 		}
 	}
@@ -234,7 +237,6 @@ void MouseFunc(Window::Button a_button, int a_mouseX, int a_mouseY, Window::Even
 	
 	}
 }
-
 
 void UI()
 {
@@ -415,8 +417,9 @@ void IterativeSelectionSort(std::vector<Sprite*>& a_sprites)
 void LoadSprites()
 {
 	//loading the sprites
-	background.load_sprite_image("assets/images/Background_final.png")
-		.set_scale(1717, 432);
+	background.load_sprite_image("assets/images/bg1.png")
+		.set_scale(1717, 432)
+		.set_position(-10, 0);
 
 	player.load_sprite_image("assets/images/main char SS.png")
 		.set_scale(100, 120)
@@ -458,19 +461,16 @@ void LoadSprites()
 		.set_position(400, 50);
 
 	theFloor.load_sprite_image("assets/images/floor.png")
-		.set_scale(640, 50)
+		.set_scale(800, 50)
 		.set_position(0, 0);
 
 	theUI.load_sprite_image("assets/images/UI.png")
-		.set_scale(660, 210)
+		.set_scale(830, 268)
 		.set_center(0, 0)
-		.set_position(-10, 390);
+		.set_position(-15, 380);
 
 	dead.load_sprite_image("assets/images/Dead.png")
 		.set_scale(140, 160);
-
-	menu.load_sprite_image("assets/images/menu.png")
-		.set_scale(640, 562);
 
 	enemies.push_back(new Dairy(600, 130, 2, 10, enemy));
 	enemies.push_back(new Meat(1200, 50, 5, 30, enemy2));
@@ -542,20 +542,14 @@ void FirstLevel()
 
 int main() 
 {
-
 	Window& theGame = Window::get_game_window();//https://en.wikipedia.org/wiki/Singleton_pattern
-	theGame.init("OPERATION CAJUN", 800, 562)
-
-		.set_screen_size(640, 562)
+	theGame.init("OPERATION CAJUN", 800, 600)
 		.set_keyboard_callback(KeyboardFunc)
 		.set_mouse_callback(MouseFunc)
 		.set_clear_color(0, 255, 0);
 
-	// We need to make a music class for sounds and streams etc. 
-	//sf::Music or Sound (the sound setting) and (loding the sound) SoundBuffer 
-	// sound buffer is also good 
-	// to add music -> menuMusic.openFromFile(file path to assets) 
-
+	// loop for music (this cannot be updated repeatedly or the sound system with break)
+	mainM.playmMusic();
 	LoadSprites();
 
 	//The main game loop
@@ -563,10 +557,7 @@ int main()
 	{
 		if (gamestates == 0)
 		{
-			//PUT THE CODE FOR THE MENU HERE
-			//THIS IS A BASE
 			mainM.drawMenu();
-
 		}
 		if (gamestates == 1)
 		{

@@ -8,6 +8,11 @@ using namespace std;
 
 Sprite comLogo, gameLogo, menuBackground, gameButton, creditButton, setButton;
 
+//pointers needed for music 
+Sound *audio = new Sound(); //pointer to audio class and will create a new Sound object
+FMOD::Sound *menuMusic; //pointer to sound, is needed
+FMOD::Channel *menuChan; // pointer to channel (not eveyrthing needs a channel and if thats the case just put 0 there)
+
 void Menu::drawMenu()
 {
 	Menu menu;
@@ -64,3 +69,16 @@ void Menu::drawCreditButton() const
 	creditButton.draw();
 
 }
+
+void Menu::playmMusic()
+{
+	audio->createSound(&menuMusic, "assets/music/menu.ogg"); // first parameter is FMOD variable, second if the just the name of the file 
+	audio->playSound(menuMusic, menuChan, false, false);
+	menuChan->setVolume(0.05f); // 1 is default volume and everything else is multiples
+}
+
+void Menu::pausemMusic() //ERRORSSSSSS
+{
+	audio->playSound(menuMusic, menuChan, true, false);
+}
+
