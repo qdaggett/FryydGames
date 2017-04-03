@@ -9,8 +9,22 @@ Monster::Monster(float newX, float newY, int newS, int h, Sprite newM)
 	monster = newM;
 	x = newX;
 	y = newY;
-	speed = newS;
-	health = h;
+	try
+	{
+		speed = newS;
+		health = h;
+
+		if (speed < 0 || health < 0)
+		{
+			throw 1;
+		}
+		
+	}
+	catch (...)
+	{
+		std::cout << "Monster Err: Negative Values" << std::endl;
+	}
+	
 
 }
 
@@ -21,6 +35,7 @@ void Monster::nextFrame()
 
 void Monster::shiftLeft(float shift)
 {
+	//this is for when the level is scrolling
 	x -= shift;
 	monster.set_position(x,y);
 }
@@ -33,16 +48,18 @@ void Monster::draw()
 
 void Monster::shiftRight(float shift)
 {
+	//this is for the level scrolling
 	x += shift;
 	monster.set_position(x, y);
 }
 
 void Monster::Collisions(float playerx, float playery, bool &attack, bool weapon, float &phealth)
 {
+	//using the formula it gets the distance between and does different things with it
 	float distanceBetween;
 
 	float radiuses = 60.0f;
-	float attackR = 90.0f;
+	float attackR = 100.0f;
 
 	//the formula
 	distanceBetween = sqrt(pow(y - playery, 2) + pow(x - playerx, 2));
@@ -51,7 +68,6 @@ void Monster::Collisions(float playerx, float playery, bool &attack, bool weapon
 	{
 		if (distanceBetween < attackR && weapon == true)
 		{
-			cout << "YOU ATTACKED" << endl;
 			health -= 10;
 			attack = false;
 		}
@@ -62,6 +78,47 @@ void Monster::Collisions(float playerx, float playery, bool &attack, bool weapon
 		phealth -= 1.0f;
 	}
 }
+
+void Monster::dummyCollisions(float playerx, float playery, bool &attack, bool weapon, Sprite &dummy)
+{
+	//using the formula it gets the distance between and does different things with it
+	float distanceBetween;
+
+	float radiuses = 60.0f;
+	float attackR = 100.0f;
+
+	//the formula
+	distanceBetween = sqrt(pow(y - playery, 2) + pow(x - playerx, 2));
+
+	if (attack == true)
+	{
+		if (distanceBetween < attackR && weapon == true)
+		{
+			dummy.set_position(getX(), getY());
+			dummy.draw();
+			//dummy.set_animation(animation);
+			//dummy.set_animation(animation);
+			//dummy.next_frame();
+			
+			/*if (dummy.get_current_frame() == 3)
+			{
+				dummy.set_animation("idle");
+			}*/
+			attack = false;
+		}
+		if (distanceBetween < attackR && weapon == false)
+		{
+			Text::set_color(0.0f, 0.0f, 1.0f);
+			Text::draw_string("Wrong weapon!", "TEMP", playerx, playery + 120);
+		}
+	}
+	if (distanceBetween < radiuses)
+	{
+		Text::set_color(1.0f, 0.0f, 0.0f);
+		Text::draw_string("OWWW", "TEMP", playerx, playery + 100);
+	}
+}
+
 //the setters
 void Monster::setD(bool newD)
 {
@@ -88,7 +145,6 @@ void Monster::setSpeed(int newS)
 	speed = newS;
 }
 
-
 //the getters
 int Monster::getHealth()
 {
@@ -113,4 +169,19 @@ float Monster::getY()
 int Monster::getSpeed()
 {
 	return speed;
+}
+
+void Monster::pause()
+{
+	if (direction == true)
+	{
+		monster.set_flipped(true);
+		monster.set_animation("idle");
+	}
+
+	else if (direction == false)
+	{
+		monster.set_flipped(false);
+		monster.set_animation("idle");
+	}
 }

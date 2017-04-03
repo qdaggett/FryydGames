@@ -1,10 +1,2 @@
-﻿  audio.cpp
-MSVCRT.lib(initializers.obj) : warning LNK4098: defaultlib 'libcmt.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
-  Generating code
-  5 of 2157 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\100623554\Documents\GitHub\FryydGames\Release\vc120.pdb'; linking object as if no debug info
-  SpriteLib2.vcxproj -> C:\Users\100623554\Documents\GitHub\FryydGames\Release\SpriteLib2.exe
-  SpriteLib2.vcxproj -> C:\Users\100623554\Documents\GitHub\FryydGames\Release\SpriteLib2.pdb (Full PDB)
+﻿  SpriteLib2.vcxproj -> C:\Users\100618734\Desktop\spritelib2_tip\Release\SpriteLib2.exe
+  SpriteLib2.vcxproj -> C:\Users\100618734\Desktop\spritelib2_tip\Release\SpriteLib2.pdb (Full PDB)

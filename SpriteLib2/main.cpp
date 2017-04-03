@@ -1,42 +1,32 @@
 #include "spritelib/spritelib.h"
-#include <fstream>
-#include <streambuf>
 #include <vector>
 #include <iostream>
-#include "Menu.h"
-#include "Monster.h"
-#include "Meat.h"
-#include "Dairy.h"
-#include "Cleaver.h"
-#include "Buttons.h"
-#include <vector>
-#include <time.h>
 #include <Windows.h>
+#include "FirstLvl.h"
+#include "BossLvl.h"
+#include "Tut.h"
 
 using namespace spritelib;
-using namespace std;
 
-Menu mainM;
-Sprite background, background2, player, enemy, enemy2, enemy3, platform, theFloor, theUI, dead;
+Sprite background, background2, player, enemy, enemy2, platform, theFloor, theUI, dead, menu, fpit, bossTest, knives;
 
-bool playerA = false;
-int counter = 600;
-int newCounter = 1300;
-int health1 = 10, health2 = 30;
-bool weapon1 = false, weapon2 = false;
 float playerHealth = 100.0f;
 float groundLvl = 50;
-int cheese = 1, meat = 1;
 int gamestates = 0;
-vector<Monster*> enemies;
 
-std::vector<Sprite*> spritesToDraw;
-void IterativeSelectionSort(std::vector<Sprite*>& a_sprites);
+std::vector<Player*> thePlayer;
+std::vector<FirstLvl*> theFirst;
+std::vector<BossLvl*> theBoss;
+std::vector<Tut*> tutorial;
 
 //physics
 float magnitude = 10;
 float acc_y = 9.8;
 int jumpCounter = 0;
+bool stopJump = false;
+bool ignore = false;
+float m = 3;
+int timer = 5;
 
 enum states
 {
@@ -48,386 +38,65 @@ enum jstates
 {
 	jumped,
 	Platform,
-	ground
+	ground,
+	fall,
+	
+};
+
+enum pstates
+{
+	none,
+	platform1, //the platforms
+	platform2,
+	platform3,
+	platform4,
+	platform5,
+	platform6,
+	platform7,
+	column1, //the columns
+	column2,
+	column3,
+	column4,
+	column5,
+	column6,
+	column7,
+	rplat1, //the refill platforms
+	rplat2
 };
 
 states curr_states = face_right;
 jstates jump_state = ground;
-
-void platformCollision(Sprite &player, Sprite &platform, float plw, float plh, float &gLvl)
-{
-	if ((player.get_position().x > platform.get_position().x - 20) && player.get_position().x < (platform.get_position().x + plw))
-	{
-		if (player.get_position().y >= platform.get_position().y + 95 && player.get_position().y <= platform.get_position().y + (100))
-		{
-			jump_state = Platform;
-		}
-	}
-}
-
-void scrollLeft(int sVal)
-{
-
-	float plx = platform.get_position().x;
-	float ply = platform.get_position().y;
-
-	float x = background.get_position().x;
-	float y = background.get_position().y;
-
-	background.set_position(x -= sVal, y);//This makes everything scroll as per the player
-	platform.set_position(((plx) -= sVal), (ply));
-	enemies[0]->shiftLeft(sVal);
-	enemies[1]->shiftLeft(sVal);
-}
-
-void scrollRight(int sVal)
-{
-
-	float plx = platform.get_position().x;
-	float ply = platform.get_position().y;
-
-	float x = background.get_position().x;
-	float y = background.get_position().y;
-
-	background.set_position(x += sVal, y); //making sure the background is greater than zero in order for it to scroll back
-	platform.set_position(((plx) += sVal), (ply));
-	enemies[0]->shiftRight(sVal);
-	enemies[1]->shiftRight(sVal);
-}
-
-void KeyboardFunc(Window::Key a_key, Window::EventType a_eventType)
-{
-
-	float x = background.get_position().x;
-	float y = background.get_position().y;
-
-	float px = player.get_position().x;
-	float py = player.get_position().y;
-
-	switch (a_eventType)
-	{
-	case Window::EventType::KeyPressed:
-	{
-		if (a_key == Window::Key::Space)
-		{
-			if (Window::EventType::KeyReleased && playerHealth > 0)
-			{
-				if (x + background.get_scale().x > Window::get_game_window().get_width(true) && 2 * x < 0)
-				{
-					jump_state = jumped;
-					jumpCounter = 0;
-				}
-			}
-		}
-
-		else if (a_key == Window::Key::D && playerHealth > 0)
-		{
-
-			if (x + background.get_scale().x > Window::get_game_window().get_width(true))
-			{
-				scrollLeft(7);
-			}
-
-			if (px + 90 < Window::get_game_window().get_width(true))
-			{
-				player.set_flipped(false);
-				player.set_position(px += 3, py);	 //if the player is less than the right boundary they can move forward
-				player.set_animation("walk");
-
-			}
-
-
-			curr_states = face_right;
-		}
-
-		else if (a_key == Window::Key::A && playerHealth > 0)
-		{
-			if (2 * x < 0)
-			{
-				scrollRight(7);
-			}
-
-			if (px > 0)
-			{
-				player.set_position(px -= 3, py); // if the player is before the left boundary they can move back
-				player.set_flipped(true);
-				player.set_animation("walk");
-			}
-			curr_states = face_left;
-		}
-		else if (a_key == Window::Key::E)
-		{
-			if (Window::EventType::KeyReleased)
-			{
-				playerA = true;
-			}
-			break;
-		}
-		else if (a_key == Window::Key::Right)
-		{
-			weapon2 = true;
-			weapon1 = false;
-		}
-		else if (a_key == Window::Key::Left)
-		{
-			weapon1 = true;
-			weapon2 = false;
-		}
-	}
-	break;
-	case Window::EventType::KeyReleased:
-	{
-		if (curr_states == face_right)
-			player.set_animation("idle");
-
-		if (curr_states == face_left)
-			player.set_animation("idle");
-	}
-	}
-}
-
-void MouseFunc(Window::Button a_button, int a_mouseX, int a_mouseY, Window::EventType a_eventType)
-{
-	Buttons game, credit, set;
-
-	//new game button coordinates
-	game.pos_x = 50;
-	game.pos_y = 80;
-	game.width = 100;
-	game.height = 50;
-
-	//pause button
-	set.pos_x = 525;
-	set.pos_y = 80;
-	set.width = 100;
-	set.height = 50;
-
-	//credit button
-	credit.pos_x = 650;
-	credit.pos_y = 80;
-	credit.width = 100;
-	credit.height = 50;
-
-	//quit button
-	//quit.pos_x =
-	//quit.pos_y =
-	//quit.width =
-	//quit.height =
-
-	switch (a_eventType) {
-
-	case Window::EventType::MouseButtonPressed:
-	{
-		if (a_button == Window::Button::LeftButton)
-		{
-			if (gamestates == 0) // the buttons will only click when it is on the menu level
-			{
-				//statement will check the coordinate of the bottom right corner of the sprite then by adding the height and width, the whole button is taken into consideration
-				// START BUTTON >>>
-				if (a_mouseX > game.pos_x && a_mouseX < game.pos_x + game.width && a_mouseY > game.pos_y && a_mouseY < game.pos_y + game.height)
-				{
-					cout << "Start Game";
-					gamestates = 1;
-					mainM.pausemMusic();
-				}
-			}
-		}
-	}
-	break;
-	
-	}
-}
-
-void UI()
-{
-	if (playerHealth > 0)
-	{
-		if (playerHealth>70) Shapes::set_color(0.0f, 1.0f, 0.0f);
-		else if (playerHealth >40) Shapes::set_color(1.0f, 1.0f, 0.0f);
-		else Shapes::set_color(1.0f, 0.0f, 0.0f);
-
-		Shapes::draw_rectangle(true, 10, 490, 2 * playerHealth, 30, 0.0f); //x, y, width, height
-	}
-
-	if (weapon1 == true)
-	{
-		Shapes::set_color(0.0f, 0.0f, 0.9f);
-		Shapes::draw_rectangle(true, 325, 480, 45, 45, 0);
-	}
-	else if (weapon2 == true)
-	{
-		Shapes::set_color(0.0f, 0.0f, 0.9f);
-		Shapes::draw_rectangle(true, 375, 480, 45, 45, 0);
-	}
-
-	Shapes::set_color(1.0f, 1.0f, 0.0f);
-	Shapes::draw_rectangle(true, 330, 485, 35, 35, 0);
-
-
-	Shapes::set_color(1.0f, 0.0f, 0.0f);
-	Shapes::draw_rectangle(true, 380, 485, 35, 35, 0);
-
-	Text::load_font("assets/KBZipaDeeDooDah.ttf", "TEMP");
-
-	Text::set_color(0.0f, 0.0f, 0.0f);
-	Text::draw_string("Health", "TEMP", 10.0f, 530.0f);
-
-	Text::draw_string("Weapons", "TEMP", 325.0f, 530.0f);
-
-
-	if (cheese == 0 && meat == 0)
-	{
-		Text::set_color(0.0f, 0.0f, 0.0f);
-		Text::draw_string("REACHED", "TEMP", 500.0f, 460.0f);
-		Text::draw_string("GOAL", "TEMP", 520.0f, 500.0f);
-	}
-	else
-	{
-		if (cheese == 0)
-		{
-			Text::set_color(0.0f, 1.0f, 0.0f);
-			Text::draw_string("Cheese", "TEMP", 500.0f, 500.0f);
-		}
-		else if (cheese == 1)
-		{
-			Text::set_color(1.0f, 0.0f, 0.0f);
-			Text::draw_string("Cheese x1", "TEMP", 500.0f, 500.0f);
-		}
-		if (meat == 1)
-		{
-			Text::set_color(1.0f, 0.0f, 0.0f);
-			Text::draw_string("Meat x1", "TEMP", 500.0f, 460.0f);
-		}
-		else if (meat == 0)
-		{
-			Text::set_color(0.0f, 1.0f, 0.0f);
-			Text::draw_string("Meat", "TEMP", 500.0f, 460.0f);
-		}
-	}
-
-
-}
-
-void Jump()
-{
-	float x = background.get_position().x;
-	float y = background.get_position().y;
-
-	float posx = player.get_position().x;
-	float posy = player.get_position().y;
-
-	if (jump_state == jumped)
-	{
-		jumpCounter++;
-
-		if (jumpCounter >= 10)
-		{
-			platformCollision(player, platform, 400, 20, groundLvl);
-		}
-
-		if (curr_states == face_right)
-		{
-			scrollLeft(7);
-
-			if (jumpCounter <= 6)
-			{
-				posx = posx + (magnitude);
-				posy = posy + (magnitude + acc_y);
-			}
-
-			else if (jumpCounter > 7 && jumpCounter <= 10)
-			{
-				posy = posy;
-				posx = posx + (magnitude);
-
-			}
-			else if (jumpCounter > 10 && jumpCounter < 17)
-			{
-				posy = posy - (magnitude + acc_y);
-				posx = posx + (magnitude);
-
-			}
-			else if (jumpCounter >= 17)
-			{
-				jump_state = ground;
-				posy = groundLvl;
-			}
-		}
-		if (curr_states == face_left)
-		{
-			scrollRight(7);
-			if (jumpCounter <= 6)
-			{
-				posx = posx - (magnitude);
-				posy = posy + (magnitude + acc_y);
-			}
-
-			else if (jumpCounter > 7 && jumpCounter <= 10)
-			{
-				posy = posy;
-				posx = posx - (magnitude);
-			}
-			else if (jumpCounter > 10 && jumpCounter < 17)
-			{
-				posy = posy - (magnitude + acc_y);
-				posx = posx - (magnitude);
-
-			}
-
-			else if (jumpCounter >= 17)
-			{
-				jump_state = ground;
-				posy = groundLvl;
-			}
-		}
-		player.set_position(posx, posy);
-	}
-}
-
-void Update()
-{
-	background.draw();
-	theUI.draw();
-	theFloor.draw();
-	platform.draw();
-
-	if (playerHealth > 0)
-		player.next_frame();
-	((Dairy*)enemies[0])->nextFrame();
-	((Meat*)enemies[1])->nextFrame();
-	((Cleaver*)enemies[2])->nextFrame();
-}
-
-void IterativeSelectionSort(std::vector<Sprite*>& a_sprites)
-{
-	for (unsigned int i = 0; i < a_sprites.size(); i++)
-	{
-		int minIndex = i;
-		for (unsigned int j = i; j < a_sprites.size(); j++)
-		{
-			if (a_sprites[j]->get_depth() < a_sprites[minIndex]->get_depth())
-			{
-				minIndex = j;
-			}
-		}
-		std::swap(a_sprites[minIndex], a_sprites[i]);
-	}
-}
+pstates plat_state = none;
 
 void LoadSprites()
 {
 	//loading the sprites
-	background.load_sprite_image("assets/images/bg1.png")
-		.set_scale(1717, 432)
-		.set_position(-10, 0);
+	background.load_sprite_image("assets/images/bg_temp_1_.png")
+		.set_scale(10434, 432);
 
-	player.load_sprite_image("assets/images/main char SS.png")
+	fpit.load_sprite_image("assets/images/pitfall.png")
+		.set_scale(260, 50)
+		//.set_position(3400, 0);
+		.set_position(3800, 0);
+
+	/*player.load_sprite_image("assets/images/main char SS.png")
 		.set_scale(100, 120)
-		.set_sprite_frame_size(141.2, 141)
+		.set_sprite_frame_size(540, 14)
 		.push_frame_row("walk", 0, 0, 141.2, 0, 5)
 		.push_frame("idle", 0, 0)
+		.push_frame("attack", 2700, 0)
 		.set_center(0, 0)
-		.set_position(0, groundLvl)
+		.set_position(300, groundLvl)
+		.set_animation("idle");*/
+
+	player.load_sprite_image("assets/images/main char SS.png")
+		.set_sprite_frame_size(540, 540)
+		.set_scale(120, 120)
+		.push_frame_row("walk", 0, 0, 540, 0, 5)
+		.push_frame("idle", 0, 0)
+		.push_frame("attack", 2700, 0)
+		.set_center(0, 0)
+		.set_position(300, groundLvl)
 		.set_animation("idle");
 
 	enemy.load_sprite_image("assets/images/cheese walk ss.png")
@@ -435,7 +104,7 @@ void LoadSprites()
 		.push_frame_row("walk", 0, 0, 460, 0, 8)
 		.push_frame("idle", 0, 0)
 		.set_scale(100, 100)
-		.set_position(600, 50)
+		.set_position(600, 130)
 		.set_center(0, 0);
 
 	enemy2.load_sprite_image("assets/images/meat walk ss.png")
@@ -443,130 +112,805 @@ void LoadSprites()
 		.set_sprite_frame_size(160, 160)
 		.push_frame_row("walk", 0, 0, 160, 0, 4)
 		.push_frame("idle", 160, 0)
-		.set_position(1200, 50)
+		//.set_position(1800, 50)
+		.set_position(2000, 50)
 		.set_animation("idle")
 		.set_center(0, 0);
 
-	enemy3.load_sprite_image("assets/images/Cleaver.png")
-		.set_scale(320, 320)
-		.set_sprite_frame_size(320, 320)
-		.push_frame("fly", 0, 0)
-		.set_position(600, 20)
-		.set_animation("fly")
-		.set_center(0, 0);
-
-
 	platform.load_sprite_image("assets/images/Table.png")
-		.set_scale(400, 120)
+		.set_scale(400, 100)
 		.set_position(400, 50);
 
 	theFloor.load_sprite_image("assets/images/floor.png")
-		.set_scale(800, 50)
+		.set_scale(640, 50)
 		.set_position(0, 0);
 
 	theUI.load_sprite_image("assets/images/UI.png")
-		.set_scale(830, 268)
+		.set_scale(660, 210)
 		.set_center(0, 0)
-		.set_position(-15, 380);
+		.set_position(-10, 390);
 
 	dead.load_sprite_image("assets/images/Dead.png")
 		.set_scale(140, 160);
 
-	enemies.push_back(new Dairy(600, 130, 2, 10, enemy));
-	enemies.push_back(new Meat(1200, 50, 5, 30, enemy2));
-	enemies.push_back(new Cleaver(600, 130, 2, 10, enemy3));
+	menu.load_sprite_image("assets/images/main_menu_1.png")
+		.set_sprite_frame_size(640, 562);
 
-	spritesToDraw.push_back(&player);
-	spritesToDraw.push_back(&enemy);
-	spritesToDraw.push_back(&enemy2);
-	spritesToDraw.push_back(&enemy3);
+	bossTest.load_sprite_image("assets/images/Gordon_Ramsay.png")
+		.set_scale(200, 300)
+		.set_position(500, 50);
+
+	knives.load_sprite_image("assets/images/knives.png")
+		.set_scale(100, 100)
+		//.set_position(2600, 300);
+		.set_position(3000, 350);
 }
 
-void FirstLevel()
+void platformCollision(Sprite &platform, float plw, float plh, pstates &p, pstates temp)
 {
-	Update();
-
-	UI();
-
-	//Does the falling off the platform stuff
-	if (jump_state == Platform)
+	if ((thePlayer[0]->getX() > platform.get_position().x-60) && thePlayer[0]->getX() < (platform.get_position().x + plw) )
 	{
-		if (player.get_position().x < platform.get_position().x - 60 || player.get_position().x >(platform.get_position().x + 380))
+		if (thePlayer[0]->getY() >= platform.get_position().y + (plh-5) && thePlayer[0]->getY() <= platform.get_position().y + (plh))
 		{
-			groundLvl = 50;
-			player.set_position(player.get_position().x, groundLvl);
-			jump_state = ground;
+			jump_state = Platform; //if the player is within range of the top of the platform then it sets the jump state to platform
+			thePlayer[0]->setY(platform.get_position().y + plh); //it also sets the new player y coordinate
+			stopJump = false; //makes it so that the player can jump again
+			p = temp;//gets the platform state
 		}
 	}
+}
 
-	Jump();
+void KeyboardFunc(Window::Key a_key, Window::EventType a_eventType)
+{
+	float x = theFirst[0]->getBX();
+	float y = theFirst[0]->getBY();
 
-	//the player death and stuff
-	if (playerHealth > 0)
-		player.draw();
-	if (playerHealth <= 0)
-	{
-		dead.set_position(player.get_position().x, player.get_position().y - 40);
-		dead.draw();
-	}
+	float px = thePlayer[0]->getX();
+	float py = thePlayer[0]->getY();
 
-	//drawing the enemies + their death
-	if (enemies[0]->getHealth() > 0)
-	{
-		((Dairy*)enemies[0])->move(400, 700, counter);
-		((Dairy*)enemies[0])->draw();
-		enemies[0]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon1, playerHealth);
-	}
-	if (enemies[1]->getHealth() > 0)
-	{
-		((Meat*)enemies[1])->move(1200, 1600, newCounter);
-		((Meat*)enemies[1])->draw();
-		enemies[1]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon2, playerHealth);
-	}
-	if (enemies[2]->getHealth() > 0)
-	{
-		((Cleaver*)enemies[2])->move(450, 1650, newCounter);
-		((Cleaver*)enemies[2])->draw();
-		enemies[2]->Collisions(player.get_position().x, player.get_position().y, playerA, weapon2, playerHealth);
-	}
+	float tx = tutorial[0]->getBX();
+	float ty = tutorial[0]->getBY();
 
-	if (enemies[0]->getHealth() == 0)
+	switch (a_eventType)
 	{
-		cheese = 0;
-	}
-	if (enemies[1]->getHealth() == 0)
-	{
-		meat = 0;
+		case Window::EventType::KeyPressed:
+		{
+			if (gamestates == 1)
+			{
+				if (a_key == Window::Key::Space)
+				{	
+					if (Window::EventType::KeyReleased && thePlayer[0]->getH() > 0 && stopJump == false)
+					{
+						if ((tutorial[0]->getBackgroundX() <= 0) && (tutorial[0]->getBackgroundX() + 2900 > Window::get_game_window().get_width(true) ))
+						{
+							jump_state = jumped; //this sets it so that the player can jump
+							jumpCounter = 0; //this is for the jump itself
+							stopJump = true; //This makes it so that they cant jump twice in a row
+						}
+						if (tutorial[0]->getBackgroundX() > 0 && curr_states == face_right)
+						{
+							float temp = 0 - tutorial[0]->getBackgroundX();
+							tutorial[0]->scrollRight(temp);
+
+							jump_state = jumped; //this sets it so that the player can jump
+							jumpCounter = 0; //this is for the jump itself
+							stopJump = true; //This makes it so that they cant jump twice in a row
+
+						}
+						if (tutorial[0]->getBackgroundX()+2900 < Window::get_game_window().get_width(true) && curr_states == face_left)
+						{
+							//float temp = tutorial[0]->getBackgroundX()-2200;
+							//tutorial[0]->scrollLeft(temp);
+
+							jump_state = jumped; //this sets it so that the player can jump
+							jumpCounter = 0; //this is for the jump itself
+							stopJump = true; //This makes it so that they cant jump twice in a row
+						}
+
+					}
+				}
+				else if (a_key == Window::Key::D && thePlayer[0]->getH() > 0) //move right
+				{
+					thePlayer[0]->setFlipped(false);
+					thePlayer[0]->setY(py); //if the player is less than the right boundary they can move forward
+					thePlayer[0]->setAnimation("walk");
+					if (tx + tutorial[0]->getBScale() > Window::get_game_window().get_width(true))
+					{
+						tutorial[0]->scrollLeft(10); //Moves the level
+					}
+
+					curr_states = face_right;
+				}
+				else if (a_key == Window::Key::A && thePlayer[0]->getH() > 0)//moving left
+				{
+					thePlayer[0]->setY(py);// if the player is before the left boundary they can move back
+					thePlayer[0]->setFlipped(true);
+					thePlayer[0]->setAnimation("walk");
+					if (2 * tx < 0)
+					{
+						tutorial[0]->scrollRight(10);
+					}
+
+					curr_states = face_left;
+				}
+				else if (a_key == Window::Key::LShift && thePlayer[0]->getH() > 0  || a_key == Window::Key::RShift && thePlayer[0]->getH() > 0)
+				{
+					//This sets it so that they can attack
+					if (Window::EventType::KeyReleased)
+					{
+						if (thePlayer[0]->getW1() == true && thePlayer[0]->getW1H() > 0)
+						{
+							thePlayer[0]->subW1();
+							thePlayer[0]->setA(true);
+							thePlayer[0]->setAnimation("attack");
+						}
+						else  if (thePlayer[0]->getW2() == true && thePlayer[0]->getW2H() > 0)
+						{
+							thePlayer[0]->subW2();
+							thePlayer[0]->setA(true);
+							thePlayer[0]->setAnimation("attack");
+
+						}
+						if (thePlayer[0]->getW1H() <= 0)
+						{
+							Text::set_color(0.0f, 0.0f, 1.0f);
+							Text::draw_string("X", "TEMP", thePlayer[0]->getX(), thePlayer[0]->getY() + 120);
+						}
+						if (thePlayer[0]->getW2H() <= 0)
+						{
+							Text::set_color(0.0f, 0.0f, 1.0f);
+							Text::draw_string("X", "TEMP", thePlayer[0]->getX(), thePlayer[0]->getY() + 120);
+						}
+
+					}
+					break;
+				}
+				else if (a_key == Window::Key::Right && thePlayer[0]->getH() > 0)
+				{
+					//switches between the weapons
+					thePlayer[0]->setW2(true);
+					thePlayer[0]->setW1(false);
+				}
+				else if (a_key == Window::Key::Left && thePlayer[0]->getH() > 0)
+				{
+					//sets the weapons
+					thePlayer[0]->setW1(true);
+					thePlayer[0]->setW2(false);
+				}
+				else if (a_key == Window::Key::E && tutorial[0]->getR() == true)
+				{
+					tutorial[0]->giveRefill(thePlayer[0]);
+				}
+				else if (a_key == Window::Key::E && tutorial[0]->getL() == true)
+				{
+					gamestates = 2;
+				}
+			}
+			if (gamestates == 2)
+			{
+				if (theFirst[0]->getP() == false)
+				{
+					if (a_key == Window::Key::Space)
+					{	
+						if (Window::EventType::KeyReleased && thePlayer[0]->getH() > 0 && stopJump == false)
+						{
+							if ((x <= 0) && (x + 10434 > Window::get_game_window().get_width(true)))
+							{
+								jump_state = jumped; //this sets it so that the player can jump
+								jumpCounter = 0; //this is for the jump itself
+								stopJump = true; //This makes it so that they cant jump twice in a row
+							}
+							else if (x > 0 && curr_states == face_right)
+							{
+								jump_state = jumped; //this sets it so that the player can jump
+								jumpCounter = 0; //this is for the jump itself
+								stopJump = true; //This makes it so that they cant jump twice in a row
+							}
+						}
+					}
+					else if (a_key == Window::Key::D && thePlayer[0]->getH() > 0) //move right
+					{	
+						thePlayer[0]->setFlipped(false);
+						thePlayer[0]->setY(py); //if the player is less than the right boundary they can move forward
+						thePlayer[0]->setAnimation("walk");
+
+						if (x + background.get_scale().x > Window::get_game_window().get_width(true))
+						{
+							theFirst[0]->scrollLeft(10); //Moves the level
+						}
+
+						curr_states = face_right;
+					}
+					else if (a_key == Window::Key::A && thePlayer[0]->getH() > 0)//moving left
+					{
+						thePlayer[0]->setY(py);// if the player is before the left boundary they can move back
+						thePlayer[0]->setFlipped(true);
+						thePlayer[0]->setAnimation("walk");
+
+						if (2 * x < 0)
+						{
+							theFirst[0]->scrollRight(10);
+						}
+
+						curr_states = face_left;
+					}
+					else if (a_key == Window::Key::LShift && thePlayer[0]->getH() > 0 || a_key == Window::Key::RShift && thePlayer[0]->getH() > 0)
+					{
+						//This sets it so that they can attack
+						if (Window::EventType::KeyReleased)
+						{
+							thePlayer[0]->setA(true);
+							
+							if (thePlayer[0]->getW1() == true)
+							{
+								thePlayer[0]->subW1();
+								thePlayer[0]->setAnimation("attack");
+							}
+							if (thePlayer[0]->getW2() == true)
+							{
+								thePlayer[0]->subW2();
+								thePlayer[0]->setAnimation("attack");
+							}
+						}
+						break;
+					}
+					else if (a_key == Window::Key::Right && thePlayer[0]->getH() > 0)
+					{
+						//switches between the weapons
+						thePlayer[0]->setW2(true);
+						thePlayer[0]->setW1(false);
+					}
+					else if (a_key == Window::Key::Left && thePlayer[0]->getH() > 0)
+					{
+						//sets the weapons
+						thePlayer[0]->setW1(true);
+						thePlayer[0]->setW2(false);
+					}
+					else if (a_key == Window::Key::R && thePlayer[0]->getH() <= 0)
+					{
+						//this is to restart
+						theFirst[0]->Restart();
+						thePlayer[0]->setH(100.0f);
+						thePlayer[0]->setW1(false);
+						thePlayer[0]->setW1(false);
+
+						groundLvl = 50;
+						thePlayer[0]->setX(300);
+						thePlayer[0]->setY(groundLvl);
+						thePlayer[0]->setH(100.0f);
+					}
+					else if (a_key == Window::Key::E && plat_state == rplat1)
+					{
+						thePlayer[0]->setW1H(10);
+						thePlayer[0]->setW2H(10);
+					}
+					else if (a_key == Window::Key::E && theFirst[0]->getLeave() == true && theFirst[0]->getGoal() == true)
+					{
+						gamestates = 3;
+					}
+			
+				}
+
+				//The P pauses the game, the B goes straight to the boss
+				if (a_key == Window::Key::P)
+				{
+					//this sets the boolean for pause 
+					if (Window::EventType::KeyReleased)
+					{
+						if (theFirst[0]->getP() == true) theFirst[0]->setP(false);
+						else if (theFirst[0]->getP() == false) theFirst[0]->setP(true);
+					}
+
+				}
+				
+			}
+			if (gamestates == 3)
+			{
+				if (a_key == Window::Key::Space)
+				{	
+					if (Window::EventType::KeyReleased && thePlayer[0]->getH() > 0 && stopJump == false)
+					{
+						jump_state = jumped; //this sets it so that the player can jump
+						jumpCounter = 0; //this is for the jump itself
+						stopJump = true; //This makes it so that they cant jump twice in a row
+					}
+				}
+				else if (a_key == Window::Key::D && thePlayer[0]->getH() > 0) //move right
+				{
+					thePlayer[0]->setFlipped(false);
+					thePlayer[0]->setY(py); //if the player is less than the right boundary they can move forward
+					thePlayer[0]->setAnimation("walk");
+				
+					float px = thePlayer[0]->getX();
+					
+					thePlayer[0]->setX(px + 10);
+
+					curr_states = face_right;
+				}
+				else if (a_key == Window::Key::A && thePlayer[0]->getH() > 0)//moving left
+				{
+					thePlayer[0]->setY(py);// if the player is before the left boundary they can move back
+					thePlayer[0]->setFlipped(true);
+					thePlayer[0]->setAnimation("walk");
+
+					float px = thePlayer[0]->getX();
+
+					thePlayer[0]->setX(px - 10);
+					
+					curr_states = face_left;
+				}
+				else if (a_key == Window::Key::LShift && thePlayer[0]->getH() > 0 || a_key == Window::Key::RShift && thePlayer[0]->getH() > 0)
+				{
+					//This sets it so that they can attack
+					if (Window::EventType::KeyReleased)
+					{
+						thePlayer[0]->setA(true);
+						if (thePlayer[0]->getW1() == true)
+						{
+							thePlayer[0]->subW1();
+						}
+						if (thePlayer[0]->getW2() == true)
+						{
+							thePlayer[0]->subW2();
+						}
+					}
+					break;
+				}
+				else if (a_key == Window::Key::Right && thePlayer[0]->getH() > 0)
+				{
+					//switches between the weapons
+					thePlayer[0]->setW2(true);
+					thePlayer[0]->setW1(false);
+				}
+				else if (a_key == Window::Key::Left && thePlayer[0]->getH() > 0)
+				{
+					//sets the weapons
+					thePlayer[0]->setW1(true);
+					thePlayer[0]->setW2(false);
+				}
+			}
+			if (a_key == Window::Key::B)
+			{
+				//the boss fight
+				gamestates = 3;
+				thePlayer[0]->setY(50);
+				thePlayer[0]->setX(300);
+				thePlayer[0]->setH(100);
+				thePlayer[0]->setW1H(10);
+				thePlayer[0]->setW2H(10);
+				thePlayer[0]->setW1(true);
+				thePlayer[0]->setW2(false);
+
+			}
+			
+			if (a_key == Window::Key::T)
+			{
+				gamestates = 1;
+				thePlayer[0]->setY(50);
+				thePlayer[0]->setX(300);
+				thePlayer[0]->setH(100);
+				thePlayer[0]->setW1H(10);
+				thePlayer[0]->setW2H(10);
+				thePlayer[0]->setW1(true);
+				thePlayer[0]->setW2(false);
+			}
+			if (a_key == Window::Key::F)
+			{
+				gamestates = 2;
+				thePlayer[0]->setY(50);
+				thePlayer[0]->setX(300);
+				thePlayer[0]->setH(100);
+				thePlayer[0]->setW1H(10);
+				thePlayer[0]->setW2H(10);
+				thePlayer[0]->setW1(true);
+				thePlayer[0]->setW2(false);
+			}
+
+		}
+		break;
+		case Window::EventType::KeyReleased:
+		{
+			if (gamestates == 1 || gamestates == 2 || gamestates == 3)
+			{
+				if (curr_states == face_right)
+					thePlayer[0]->setAnimation("idle");
+
+				if (curr_states == face_left)
+					thePlayer[0]->setAnimation("idle");
+			}
+		}
 	}
 }
 
-int main() 
+void Jump()
+{
+	float x = background.get_position().x;
+	float y = background.get_position().y;
+
+	float posx = thePlayer[0]->getX();
+	float posy = thePlayer[0]->getY();
+	
+	if (jump_state == jumped)
+	{
+		jumpCounter++;
+		
+		if (gamestates == 1)
+		{
+			if (tutorial[0]->getBackgroundX() >= 0 || tutorial[0]->getBackgroundX() + 2900 < Window::get_game_window().get_width(true))
+			{
+				jump_state = fall;
+				stopJump = false;
+			}
+		}
+		if (gamestates == 2)
+		{
+			if ((theFirst[0]->getBX() >= 0 || theFirst[0]->getBX() + 10434 < Window::get_game_window().get_width(true)))
+			{
+				jump_state = fall;
+				stopJump = false;
+			}
+		}
+
+		if (jumpCounter >= 10)
+		{
+			if (gamestates == 2)
+			{
+				//the platforms
+				platformCollision(theFirst[0]->getPlat(), 400, 100, plat_state, platform1);
+				platformCollision(theFirst[0]->getPlat2(), 400, 100, plat_state, platform2);
+				platformCollision(theFirst[0]->getPlat3(), 400, 100, plat_state, platform3);
+				platformCollision(theFirst[0]->getPlat4(), 400, 100, plat_state, platform4);
+				platformCollision(theFirst[0]->getPlat5(), 250, 100, plat_state, platform5);
+				platformCollision(theFirst[0]->getPlat6(), 250, 100, plat_state, platform6);
+				platformCollision(theFirst[0]->getPlat7(), 400, 100, plat_state, platform7);
+				
+				//the columns
+				platformCollision(theFirst[0]->getC1(), 100, 100, plat_state, column1);
+				platformCollision(theFirst[0]->getC2(), 100, 200, plat_state, column2);
+				platformCollision(theFirst[0]->getC3(), 200, 100, plat_state, column3);
+				platformCollision(theFirst[0]->getC4(), 100, 100, plat_state, column4);
+				platformCollision(theFirst[0]->getC5(), 200, 100, plat_state, column5);
+				platformCollision(theFirst[0]->getC6(), 100, 200, plat_state, column6);
+				platformCollision(theFirst[0]->getC7(), 200, 100, plat_state, column7);
+
+				//the refill platforms
+				platformCollision(theFirst[0]->getRP1(), 150, 200, plat_state, rplat1);
+				platformCollision(theFirst[0]->getRP2(), 100, 100, plat_state, rplat2);
+			}
+			if (gamestates == 1)
+			{
+				platformCollision(tutorial[0]->getPlat(), 400, 100, plat_state, platform1);
+			}
+		}	
+		if (curr_states == face_right)
+		{	
+			if (jumpCounter <= 6)
+			{
+				if (gamestates == 1)
+					tutorial[0]->scrollLeft((magnitude + 6));
+				else if (gamestates == 2)
+					theFirst[0]->scrollLeft((magnitude+6));
+				
+				posy = posy + (magnitude + acc_y);
+			}
+			else if (jumpCounter > 7 && jumpCounter <= 10)
+			{
+				posy = posy;
+
+				if (gamestates == 1)
+					tutorial[0]->scrollLeft((magnitude + 6));
+				else if (gamestates == 2)
+					theFirst[0]->scrollLeft((magnitude + 6));
+				
+			}
+			else if (jumpCounter > 10 && jumpCounter < 17)
+			{
+				posy = posy - (magnitude + acc_y);
+				if (gamestates == 1)
+					tutorial[0]->scrollLeft((magnitude + 6));
+				else if (gamestates == 2)
+					theFirst[0]->scrollLeft((magnitude + 6));
+				
+				
+			}
+			else if (jumpCounter >= 17)
+			{
+
+				//if (plat_state != platform5)
+				if (jumpCounter >= 18)
+				jump_state = fall;
+				stopJump = false;
+			}
+		}
+		if (curr_states == face_left)
+		{
+			if (jumpCounter <= 6)
+			{
+				if (gamestates == 1)
+					tutorial[0]->scrollRight(magnitude + 6);
+				else if (gamestates == 2)
+					theFirst[0]->scrollRight(magnitude+6);
+				posy = posy + (magnitude + acc_y);
+			}
+			else if (jumpCounter > 7 && jumpCounter <= 10)
+			{
+				if (gamestates == 1)
+					tutorial[0]->scrollRight(magnitude + 6);
+				else if (gamestates == 2)
+					theFirst[0]->scrollRight(magnitude + 6);
+				posy = posy;
+				
+			}
+			else if (jumpCounter > 10 && jumpCounter < 17)
+			{
+				if (gamestates == 1)
+					tutorial[0]->scrollRight(magnitude + 6);
+				else if (gamestates == 2)
+					theFirst[0]->scrollRight(magnitude + 6);
+				posy = posy - (magnitude + acc_y);	
+
+			}
+			else if (jumpCounter >= 17)
+			{
+				
+				//if (plat_state != platform5)
+				if (jumpCounter >= 18)
+				jump_state = fall;
+				stopJump = false;
+			}
+		}
+		
+		thePlayer[0]->setX(posx);
+		thePlayer[0]->setY(posy);
+	}
+}
+
+void Fall(int leftBound, int rightBound)
+{
+	if (thePlayer[0]->getX() < leftBound || thePlayer[0]->getX() >rightBound)
+	{
+		if (thePlayer[0]->getY()> 50)
+		{
+			jump_state = fall;
+		}
+	}
+}
+
+void Update()
+{
+	if (thePlayer[0]->getH() > 0)
+	thePlayer[0]->nextFrame();
+}
+
+int main()
 {
 	Window& theGame = Window::get_game_window();//https://en.wikipedia.org/wiki/Singleton_pattern
-	theGame.init("OPERATION CAJUN", 800, 600)
+	theGame.init("OPERATION CAJUN", 800, 562)
+		.set_screen_size(640, 562)
 		.set_keyboard_callback(KeyboardFunc)
-		.set_mouse_callback(MouseFunc)
 		.set_clear_color(0, 255, 0);
 
-	// loop for music (this cannot be updated repeatedly or the sound system with break)
-	mainM.playmMusic();
 	LoadSprites();
+
+	thePlayer.push_back(new Player(player, 300, groundLvl));
+	theFirst.push_back(new FirstLvl(background, platform, enemy, enemy2, platform, theFloor, theUI, dead, fpit, knives));
+	theBoss.push_back(new BossLvl(theFloor, background, bossTest));
+	tutorial.push_back(new Tut(theFloor, background, platform));
 
 	//The main game loop
 	while (theGame.update(30))
 	{
 		if (gamestates == 0)
 		{
-			mainM.drawMenu();
-		}
+			menu.draw();
+
+			if (GetAsyncKeyState('A')) gamestates = 1;
+		}	
 		if (gamestates == 1)
 		{
-			FirstLevel();
-		}
+			std::cout << tutorial[0]->getBackgroundX() << std::endl;
+			tutorial[0]->RunLevel(thePlayer[0]->getH(), thePlayer[0]->getW1(), thePlayer[0]->getW2(), thePlayer[0]->getW1H(), thePlayer[0]->getW2H(), thePlayer[0]);
+			Update();
+			Jump();
 
+			//fixes the attack issue
+			if (thePlayer[0]->getA() == true)
+			{
+				timer--;
+			}
+			if (timer == 0)
+			{
+				thePlayer[0]->setA(false);
+				timer = 5;
+			}
+
+			if (jump_state == Platform) //this checks if the player is on a platform. And then it sets the parameters for the player to fall depending
+			{
+				if (plat_state == platform1)
+				{
+					Fall((tutorial[0]->getPX() - 60), ((tutorial[0]->getPX() + 320)));
+				}
+			}
+
+			if (jump_state == fall) //This is if the player is falling. It decreases the player's y position
+			{
+				if (thePlayer[0]->getY() > 50)
+				{
+					float posy = thePlayer[0]->getY();
+					thePlayer[0]->setY(posy -= (10));
+
+					//the platforms
+					platformCollision(tutorial[0]->getPlat(), 400, 100, plat_state, platform1);
+				}
+				if (thePlayer[0]->getY() <= 50)
+				{
+					jump_state = ground;
+					plat_state = none;
+					thePlayer[0]->setY(50);
+				}
+			}
+		}
+		if (gamestates == 2)
+		{
+			float temp = thePlayer[0]->getH();
+			theFirst[0]->RunLevel(temp, thePlayer[0]->getW1(), thePlayer[0]->getW2(), thePlayer[0]->getW1H(), thePlayer[0]->getW2H(), thePlayer[0]);
+			thePlayer[0]->setH(temp);
+			Update();
+
+			//fixes the attack issue
+			if (thePlayer[0]->getA() == true)
+			{
+				timer--;
+			}
+			if (timer == 0)
+			{
+				thePlayer[0]->setA(false);
+				timer = 5;
+			}
+
+			if (theFirst[0]->getP() == false)
+			{
+				theFirst[0]->Pitfall(theFirst[0]->getFall(), thePlayer[0], 160);
+				theFirst[0]->Pitfall(theFirst[0]->getFall2(), thePlayer[0], 1100);
+				theFirst[0]->Pitfall(theFirst[0]->getFall3(), thePlayer[0], 810);
+
+				if (jump_state == Platform) //this checks if the player is on a platform. And then it sets the parameters for the player to fall depending
+				{
+					if (plat_state == platform1)
+					{
+						Fall((theFirst[0]->getPX() - 60), ((theFirst[0]->getPX() + 320)));
+					}
+					if (plat_state == platform2)
+					{
+						Fall((theFirst[0]->getPX2() - 60), ((theFirst[0]->getPX2() + 320)));
+					}
+					if (plat_state == platform3)
+					{
+						Fall((theFirst[0]->getPX3() - 60), ((theFirst[0]->getPX3() + 320)));
+					}
+					if (plat_state == platform4)
+					{
+						Fall((theFirst[0]->getPX4() - 60), ((theFirst[0]->getPX4() + 320)));
+					}
+					if (plat_state == platform5)
+					{
+						Fall((theFirst[0]->getPX5() - 60), ((theFirst[0]->getPX5()) + 200));
+					}
+					if (plat_state == platform6)
+					{
+						Fall((theFirst[0]->getPX6() - 60), ((theFirst[0]->getPX6()) + 200));
+					}
+					if (plat_state == platform7)
+					{
+						Fall((theFirst[0]->getPX7() - 60), ((theFirst[0]->getPX7()) + 320));
+					}
+
+					//the columns
+					if (plat_state == column1)
+					{
+						Fall((theFirst[0]->getC1X() - 85), ((theFirst[0]->getC1X()) + 50));
+					}
+					if (plat_state == column2)
+					{
+						Fall((theFirst[0]->getC2X() - 85), ((theFirst[0]->getC2X()) + 50));
+					}
+					if (plat_state == column3)
+					{
+						Fall((theFirst[0]->getC3X() - 85), ((theFirst[0]->getC3X()) + 150));
+					}
+					if (plat_state == column4)
+					{
+						Fall((theFirst[0]->getC4X() - 85), ((theFirst[0]->getC4X()) + 50));
+					}
+					if (plat_state == column5)
+					{
+						Fall((theFirst[0]->getC5X() - 85), ((theFirst[0]->getC5X()) + 150));
+					}
+					if (plat_state == column6)
+					{
+						Fall((theFirst[0]->getC6X() - 85), ((theFirst[0]->getC6X()) + 50));
+					}
+					if (plat_state == column7)
+					{
+						Fall((theFirst[0]->getC7X() - 85), ((theFirst[0]->getC7X()) + 180));
+					}
+
+					//the refill platforms
+					if (plat_state == rplat1)
+					{
+						Fall((theFirst[0]->getRPX1() - 85), ((theFirst[0]->getRPX1() + 50)));
+					}
+					if (plat_state == rplat2)
+					{
+						Fall((theFirst[0]->getRPX2() - 85), ((theFirst[0]->getRPX2() + 50)));
+					}
+					
+				}
+
+				if (jump_state == fall) //This is if the player is falling. It decreases the player's y position
+				{
+					if (thePlayer[0]->getY() > 50)
+					{
+						float posy = thePlayer[0]->getY();
+						thePlayer[0]->setY(posy -= (10));
+
+						//the platforms
+						platformCollision(theFirst[0]->getPlat(), 400, 100, plat_state, platform1);
+						platformCollision(theFirst[0]->getPlat2(), 400, 100, plat_state, platform2);
+						platformCollision(theFirst[0]->getPlat3(), 400, 100, plat_state, platform3);
+						platformCollision(theFirst[0]->getPlat4(), 400, 100, plat_state, platform4);
+						platformCollision(theFirst[0]->getPlat5(), 250, 100, plat_state, platform5);
+						platformCollision(theFirst[0]->getPlat6(), 250, 100, plat_state, platform6);
+						platformCollision(theFirst[0]->getPlat7(), 250, 100, plat_state, platform7);
+						
+						//the columns
+						platformCollision(theFirst[0]->getC1(), 100, 100, plat_state, column1);
+						platformCollision(theFirst[0]->getC2(), 100, 200, plat_state, column2);
+						platformCollision(theFirst[0]->getC3(), 200, 100, plat_state, column3);
+						platformCollision(theFirst[0]->getC4(), 100, 100, plat_state, column4);
+						platformCollision(theFirst[0]->getC5(), 200, 100, plat_state, column5);
+						platformCollision(theFirst[0]->getC6(), 100, 200, plat_state, column6);
+						platformCollision(theFirst[0]->getC7(), 200, 100, plat_state, column7);
+
+						//refill platforms
+						//the refill platforms
+						platformCollision(theFirst[0]->getRP1(), 150, 200, plat_state, rplat1);
+						platformCollision(theFirst[0]->getRP2(), 100, 100, plat_state, rplat2);
+					}
+					if (thePlayer[0]->getY() <= 50)
+					{
+						jump_state = ground;
+						plat_state = none;
+						thePlayer[0]->setY(50);
+					}
+				}
+				
+				Jump();
+			}	
+		
+		}		
+		if (gamestates == 3)
+		{
+			//fixes the attack issue
+			if (thePlayer[0]->getA() == true)
+			{
+				timer--;
+			}
+			if (timer == 0)
+			{
+				thePlayer[0]->setA(false);
+				timer = 5;
+			}
+
+			theBoss[0]->RunLevel(thePlayer[0]->getH(), thePlayer[0]->getW1(), thePlayer[0]->getW2(), thePlayer[0]->getW1H(), thePlayer[0]->getW2H(), thePlayer[0]);
+			Update();
+			Jump();
+		}
 	}
+
+	delete thePlayer[0];
+	delete theFirst[0];
+	
 	return 0;
 }
-
-
 

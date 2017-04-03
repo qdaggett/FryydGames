@@ -17,7 +17,10 @@ public:
 
 	void nextFrame();
 
-	void Collisions(float playerx, float playery, bool &attack, bool weapon, float &phealth);
+	virtual void Collisions(float playerx, float playery, bool &attack, bool weapon, float &phealth);
+
+	//for the tutorial
+	void dummyCollisions(float playerx, float playery, bool &attack, bool weapon, Sprite &dummy);
 
 	//All the getters
 	bool getD();
@@ -42,6 +45,7 @@ public:
 
 	void setSpeed(int newS);
 
+	void pause();
 
 protected:
 	

@@ -6,6 +6,8 @@ Cleaver::Cleaver(int x, int y, int newS, int h, Sprite newM)
 	setD(true);
 }
 
+
+
 void Cleaver::move(int backLimit, int frontLimit, int &thecounter)
 {
 	float posx = getX();

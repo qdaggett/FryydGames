@@ -45,6 +45,31 @@ namespace spritelib
 
 		return *this;
 	}
+	/*
+	Window& Window::makeWindow(std::string a_game_name, unsigned int a_width, unsigned int a_height, bool a_full_screen)
+	{
+		m_name = a_game_name;
+		m_width = a_width;
+		m_height = a_height;
+		m_proj = new math::Matrix4x4();
+		*m_proj = math::Matrix4x4::ortho(0.0f, (float)m_width, 0.0f, (float)m_height, -100.0f, 100.0f);
+
+		m_window->create(sf::VideoMode(m_width, m_height), m_name, a_full_screen ? sf::Style::Fullscreen : sf::Style::Default);
+		set_screen_size(m_width, m_height);
+		m_window->setActive(); 
+
+		// we are going to add an if statement that if there is another window open then it will be set to not visible when other is active
+
+		glewInit();
+
+		glEnable(GL_BLEND);
+		glLineWidth(5.0f);
+		glDisable(GL_DEPTH_TEST);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+		return *this;
+	}
+	*/
 
 	Window & Window::set_screen_size(unsigned int a_width, unsigned int a_height)
 	{

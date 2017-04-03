@@ -163,6 +163,7 @@ namespace spritelib
 			- fullscreen is a boolean, which toggles the game in and out of fullscreen.
 		*/
 		Window& init(std::string a_gameName, unsigned int a_width = 1280, unsigned int a_height = 720, bool a_fullscreen = false);
+	//	Window& makeWindow(std::string a_game_name, unsigned int a_width = 1280, unsigned int a_height = 720, bool a_full_screen);
 		/* update
 			- target fps is the frames-per-second that your game will limit itself to. 
 			- This function needs to be called every single frame of your game. It is an IMPORTANT part of the main game loop

@@ -1,5 +1,6 @@
 #include "Meat.h"
 
+
 Meat::Meat(int x, int y, int newS, int h, Sprite newM)
 	: Monster(x, y, newS, h, newM)
 {
@@ -12,6 +13,7 @@ void Meat::move(int backLimit, int frontLimit, int &thecounter)
 	float posy = getY();
 	if (getD() == true)
 	{
+		
 		monster.set_flipped(true);
 		monster.set_animation("walk");
 		setX(posx -= getSpeed());

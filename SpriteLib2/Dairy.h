@@ -8,6 +8,7 @@ public:
 
 	void move(int backLimit, int frontLimit, int &thecounter);
 
+	
 private:
-
+	
 };
